@@ -8,7 +8,6 @@
 @Explain : Database config methods.
 """
 
-
 from typing import Any, TypedDict, TypeVar, Generic
 from datetime import (
     datetime as Datetime,
@@ -23,7 +22,6 @@ from . import rengine
 from . import rorm
 from .rbase import DatabaseBase
 
-
 __all__ = (
     'DatabaseORMTableConfig',
     'DatabaseConfigSuper',
@@ -31,13 +29,11 @@ __all__ = (
     'DatabaseConfigAsync'
 )
 
-
 type ConfigValue = bool | str | int | float | list | tuple | dict | set | Datetime | Date | Time | Timedelta | None
 ConfigRow = TypedDict('ConfigRow', {'key': str, 'value': ConfigValue, 'note': str | None})
 type ConfigTable = list[ConfigRow]
 ConfigValueT = TypeVar('T', bound=ConfigValue) # Any.
 DatabaseEngineT = TypeVar('DatabaseEngineT', 'rengine.DatabaseEngine', 'rengine.DatabaseEngineAsync')
-
 
 class DatabaseORMTableConfig(rorm.Table):
     """
@@ -53,7 +49,6 @@ class DatabaseORMTableConfig(rorm.Table):
     type: str = rorm.Field(rorm.types.VARCHAR(50), not_null=True, comment='Config value type.')
     note: str = rorm.Field(rorm.types.VARCHAR(500), comment='Config note.')
 
-
 class DatabaseConfigSuper(DatabaseBase, Generic[DatabaseEngineT]):
     """
     Database config super type.
@@ -61,7 +56,6 @@ class DatabaseConfigSuper(DatabaseBase, Generic[DatabaseEngineT]):
     """
 
     _checked: bool = False
-
 
     def __init__(self, engine: DatabaseEngineT) -> None:
         """
@@ -82,7 +76,6 @@ class DatabaseConfigSuper(DatabaseBase, Generic[DatabaseEngineT]):
             elif type(self) == DatabaseConfigAsync:
                 engine.sync_engine.config.build_db()
             self._checked = True
-
 
     def handle_build_db(self) -> tuple[list[type[DatabaseORMTableConfig]], list[dict[str, Any]]] :
         """
@@ -134,7 +127,6 @@ class DatabaseConfigSuper(DatabaseBase, Generic[DatabaseEngineT]):
 
         return tables, views_stats
 
-
 class DatabaseConfig(DatabaseConfigSuper['rengine.DatabaseEngine']):
     """
     Database config type.
@@ -149,7 +141,6 @@ class DatabaseConfig(DatabaseConfigSuper['rengine.DatabaseEngine']):
     (1, 2)
     """
 
-
     def build_db(self) -> None:
         """
         Check and build database tables.
@@ -160,7 +151,6 @@ class DatabaseConfig(DatabaseConfigSuper['rengine.DatabaseEngine']):
 
         # Build.
         self.engine.build.build(tables=tables, views_stats=views_stats, skip=True)
-
 
     def data(self) -> ConfigTable:
         """
@@ -190,7 +180,6 @@ class DatabaseConfig(DatabaseConfigSuper['rengine.DatabaseEngine']):
         ]
 
         return result
-
 
     def get(self, key: str, default: ConfigValueT | None = None) -> ConfigValue | ConfigValueT:
         """
@@ -225,7 +214,6 @@ class DatabaseConfig(DatabaseConfigSuper['rengine.DatabaseEngine']):
             value = eval(value, global_dict)
 
         return value
-
 
     def setdefault(
         self,
@@ -266,7 +254,6 @@ class DatabaseConfig(DatabaseConfigSuper['rengine.DatabaseEngine']):
 
         return default
 
-
     def update(self, data: ConfigRow | ConfigTable) -> None:
         """
         Update config values.
@@ -295,7 +282,6 @@ class DatabaseConfig(DatabaseConfigSuper['rengine.DatabaseEngine']):
             update_time=':NOW()'
         )
 
-
     def remove(self, key: str | list[str]) -> None:
         """
         Remove config.
@@ -323,7 +309,6 @@ class DatabaseConfig(DatabaseConfigSuper['rengine.DatabaseEngine']):
         if result.rowcount == 0:
             throw(KeyError, key)
 
-
     def items(self) -> dict[str, ConfigValue]:
         """
         Get all config keys and values.
@@ -349,7 +334,6 @@ class DatabaseConfig(DatabaseConfigSuper['rengine.DatabaseEngine']):
 
         return result
 
-
     def keys(self) -> list[str]:
         """
         Get all config keys.
@@ -373,7 +357,6 @@ class DatabaseConfig(DatabaseConfigSuper['rengine.DatabaseEngine']):
         ]
 
         return result
-
 
     def values(self) -> list[ConfigValue]:
         """
@@ -399,7 +382,6 @@ class DatabaseConfig(DatabaseConfigSuper['rengine.DatabaseEngine']):
 
         return result
 
-
     def __getitem__(self, key: str) -> ConfigValue:
         """
         Get config value.
@@ -421,7 +403,6 @@ class DatabaseConfig(DatabaseConfigSuper['rengine.DatabaseEngine']):
             throw(KeyError, key)
 
         return value
-
 
     def __setitem__(
         self,
@@ -452,7 +433,6 @@ class DatabaseConfig(DatabaseConfigSuper['rengine.DatabaseEngine']):
         }
         self.update(data)
 
-
 class DatabaseConfigAsync(DatabaseConfigSuper['rengine.DatabaseEngineAsync']):
     """
     Asynchronous database config type.
@@ -467,7 +447,6 @@ class DatabaseConfigAsync(DatabaseConfigSuper['rengine.DatabaseEngineAsync']):
     (1, 2)
     """
 
-
     async def build_db(self) -> None:
         """
         Asynchronous check and build database tables.
@@ -478,7 +457,6 @@ class DatabaseConfigAsync(DatabaseConfigSuper['rengine.DatabaseEngineAsync']):
 
         # Build.
         await self.engine.build.build(tables=tables, views_stats=views_stats, skip=True)
-
 
     async def data(self) -> ConfigTable:
         """
@@ -508,7 +486,6 @@ class DatabaseConfigAsync(DatabaseConfigSuper['rengine.DatabaseEngineAsync']):
         ]
 
         return result
-
 
     async def get(self, key: str, default: ConfigValueT | None = None) -> ConfigValue | ConfigValueT:
         """
@@ -543,7 +520,6 @@ class DatabaseConfigAsync(DatabaseConfigSuper['rengine.DatabaseEngineAsync']):
             value = eval(value, global_dict)
 
         return value
-
 
     async def setdefault(
         self,
@@ -584,7 +560,6 @@ class DatabaseConfigAsync(DatabaseConfigSuper['rengine.DatabaseEngineAsync']):
 
         return default
 
-
     async def update(self, data: ConfigRow | ConfigTable) -> None:
         """
         Asynchronous update config values.
@@ -613,7 +588,6 @@ class DatabaseConfigAsync(DatabaseConfigSuper['rengine.DatabaseEngineAsync']):
             update_time=':NOW()'
         )
 
-
     async def remove(self, key: str | list[str]) -> None:
         """
         Asynchronous remove config.
@@ -641,7 +615,6 @@ class DatabaseConfigAsync(DatabaseConfigSuper['rengine.DatabaseEngineAsync']):
         if result.rowcount == 0:
             throw(KeyError, key)
 
-
     async def items(self) -> dict[str, ConfigValue]:
         """
         Asynchronous get all config keys and values.
@@ -667,7 +640,6 @@ class DatabaseConfigAsync(DatabaseConfigSuper['rengine.DatabaseEngineAsync']):
 
         return result
 
-
     async def keys(self) -> list[str]:
         """
         Asynchronous get all config keys.
@@ -691,7 +663,6 @@ class DatabaseConfigAsync(DatabaseConfigSuper['rengine.DatabaseEngineAsync']):
         ]
 
         return result
-
 
     async def values(self) -> list[ConfigValue]:
         """
@@ -717,7 +688,6 @@ class DatabaseConfigAsync(DatabaseConfigSuper['rengine.DatabaseEngineAsync']):
 
         return result
 
-
     async def __getitem__(self, key: str) -> ConfigValue:
         """
         Asynchronous get config value.
@@ -739,7 +709,6 @@ class DatabaseConfigAsync(DatabaseConfigSuper['rengine.DatabaseEngineAsync']):
             throw(KeyError, key)
 
         return value
-
 
     async def __setitem__(
         self,

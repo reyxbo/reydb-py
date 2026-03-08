@@ -8,7 +8,6 @@
 @Explain : Database connection methods.
 """
 
-
 from typing import Self, TypeVar, Generic
 from sqlalchemy import Connection, Transaction
 from sqlalchemy.ext.asyncio import AsyncConnection, AsyncTransaction
@@ -16,23 +15,19 @@ from sqlalchemy.ext.asyncio import AsyncConnection, AsyncTransaction
 from . import rengine, rexec
 from .rbase import ConnectionT, TransactionT, DatabaseBase
 
-
 __all__ = (
     'DatabaseConnectionSuper',
     'DatabaseConnection',
     'DatabaseConnectionAsync'
 )
 
-
 DatabaseEngineT = TypeVar('DatabaseEngineT', 'rengine.DatabaseEngine', 'rengine.DatabaseEngineAsync')
 DatabaseExecuteT = TypeVar('DatabaseExecuteT', 'rexec.DatabaseExecute', 'rexec.DatabaseExecuteAsync')
-
 
 class DatabaseConnectionSuper(DatabaseBase, Generic[DatabaseEngineT, DatabaseExecuteT, ConnectionT, TransactionT]):
     """
     Database connection super type.
     """
-
 
     def __init__(
         self,
@@ -60,12 +55,10 @@ class DatabaseConnectionSuper(DatabaseBase, Generic[DatabaseEngineT, DatabaseExe
         self.connection: ConnectionT | None = None
         self.transaction: TransactionT | None = None
 
-
 class DatabaseConnection(DatabaseConnectionSuper['rengine.DatabaseEngine', 'rexec.DatabaseExecute', Connection, Transaction]):
     """
     Database connection type.
     """
-
 
     def __enter__(self) -> Self:
         """
@@ -77,7 +70,6 @@ class DatabaseConnection(DatabaseConnectionSuper['rengine.DatabaseEngine', 'rexe
         """
 
         return self
-
 
     def __exit__(
         self,
@@ -99,7 +91,6 @@ class DatabaseConnection(DatabaseConnectionSuper['rengine.DatabaseEngine', 'rexe
         # Close.
         self.close()
 
-
     def get_conn(self) -> Connection:
         """
         Get `Connection` instance.
@@ -114,7 +105,6 @@ class DatabaseConnection(DatabaseConnectionSuper['rengine.DatabaseEngine', 'rexe
             self.connection = self.engine.engine.connect()
 
         return self.connection
-
 
     def get_begin(self) -> Transaction:
         """
@@ -132,7 +122,6 @@ class DatabaseConnection(DatabaseConnectionSuper['rengine.DatabaseEngine', 'rexe
 
         return self.transaction
 
-
     def commit(self) -> None:
         """
         Commit cumulative executions.
@@ -143,7 +132,6 @@ class DatabaseConnection(DatabaseConnectionSuper['rengine.DatabaseEngine', 'rexe
             self.transaction.commit()
             self.transaction = None
 
-
     def rollback(self) -> None:
         """
         Rollback cumulative executions.
@@ -153,7 +141,6 @@ class DatabaseConnection(DatabaseConnectionSuper['rengine.DatabaseEngine', 'rexe
         if self.transaction is not None:
             self.transaction.rollback()
             self.transaction = None
-
 
     def close(self) -> None:
         """
@@ -168,12 +155,10 @@ class DatabaseConnection(DatabaseConnectionSuper['rengine.DatabaseEngine', 'rexe
             self.connection.close()
             self.connection = None
 
-
 class DatabaseConnectionAsync(DatabaseConnectionSuper['rengine.DatabaseEngineAsync', 'rexec.DatabaseExecuteAsync', AsyncConnection, AsyncTransaction]):
     """
     Asynchronous database connection type.
     """
-
 
     async def __aenter__(self):
         """
@@ -185,7 +170,6 @@ class DatabaseConnectionAsync(DatabaseConnectionSuper['rengine.DatabaseEngineAsy
         """
 
         return self
-
 
     async def __aexit__(
         self,
@@ -207,7 +191,6 @@ class DatabaseConnectionAsync(DatabaseConnectionSuper['rengine.DatabaseEngineAsy
         # Close.
         await self.close()
 
-
     async def get_conn(self) -> AsyncConnection:
         """
         Asynchronous get `AsyncConnection` instance.
@@ -222,7 +205,6 @@ class DatabaseConnectionAsync(DatabaseConnectionSuper['rengine.DatabaseEngineAsy
             self.connection = await self.engine.engine.connect()
 
         return self.connection
-
 
     async def get_begin(self) -> AsyncTransaction:
         """
@@ -240,7 +222,6 @@ class DatabaseConnectionAsync(DatabaseConnectionSuper['rengine.DatabaseEngineAsy
 
         return self.transaction
 
-
     async def commit(self) -> None:
         """
         Asynchronous commit cumulative executions.
@@ -251,7 +232,6 @@ class DatabaseConnectionAsync(DatabaseConnectionSuper['rengine.DatabaseEngineAsy
             await self.transaction.commit()
             self.transaction = None
 
-
     async def rollback(self) -> None:
         """
         Asynchronous rollback cumulative executions.
@@ -261,7 +241,6 @@ class DatabaseConnectionAsync(DatabaseConnectionSuper['rengine.DatabaseEngineAsy
         if self.transaction is not None:
             await self.transaction.rollback()
             self.transaction = None
-
 
     async def close(self) -> None:
         """

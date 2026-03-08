@@ -8,7 +8,6 @@
 @Explain : Database engine methods.
 """
 
-
 from typing import TypeVar, Generic
 from urllib.parse import quote as urllib_quote
 from sqlalchemy import Engine, create_engine as sqlalchemy_create_engine
@@ -19,13 +18,11 @@ from reykit.rtext import join_data_text
 
 from . import rbase, rbuild, rconfig, rconn, rerror, rexec, rinfo, rorm
 
-
 __all__ = (
     'DatabaseEngineSuper',
     'DatabaseEngine',
     'DatabaseEngineAsync'
 )
-
 
 DatabaseConnectionT = TypeVar('DatabaseConnectionT', 'rconn.DatabaseConnection', 'rconn.DatabaseConnectionAsync')
 DatabaseExecuteT = TypeVar('DatabaseExecuteT', 'rexec.DatabaseExecute', 'rexec.DatabaseExecuteAsync')
@@ -58,7 +55,6 @@ DatabaseInformationParameterStatusGlobalT = TypeVar(
     'rinfo.DatabaseInformationParameterStatusGlobalAsync'
 )
 
-
 class DatabaseEngineSuper(
     rbase.DatabaseBase,
     Generic[
@@ -78,7 +74,6 @@ class DatabaseEngineSuper(
     """
     Database engine super type, based `PostgreSQL`.
     """
-
 
     def __init__(
         self,
@@ -142,7 +137,6 @@ class DatabaseEngineSuper(
         ## Create engine.
         self.engine = self.__create_engine()
 
-
     def __str__(self) -> str:
         """
         Return connection information text.
@@ -165,7 +159,6 @@ class DatabaseEngineSuper(
 
         return text
 
-
     @property
     def backend(self) -> str:
         """
@@ -182,7 +175,6 @@ class DatabaseEngineSuper(
 
         return backend
 
-
     @property
     def driver(self) -> str:
         """
@@ -198,7 +190,6 @@ class DatabaseEngineSuper(
         driver = url_params['driver']
 
         return driver
-
 
     @property
     def url(self) -> str:
@@ -230,7 +221,6 @@ class DatabaseEngineSuper(
 
         return url_
 
-
     def __create_engine(self) -> rbase.EngineT:
         """
         Create database `Engine` object.
@@ -259,7 +249,6 @@ class DatabaseEngineSuper(
 
         return engine
 
-
     @property
     def conn_count(self) -> int:
         """
@@ -275,7 +264,6 @@ class DatabaseEngineSuper(
         count = self.max_keep + _overflow
 
         return count
-
 
     def connect(self, autocommit: bool = False) -> DatabaseConnectionT:
         """
@@ -299,7 +287,6 @@ class DatabaseEngineSuper(
 
         return conn
 
-
     @property
     def execute(self) -> DatabaseExecuteT:
         """
@@ -315,7 +302,6 @@ class DatabaseEngineSuper(
         exec = conn.execute
 
         return exec
-
 
     @property
     def orm(self) -> DatabaseORMT:
@@ -336,7 +322,6 @@ class DatabaseEngineSuper(
 
         return orm
 
-
     @property
     def build(self) -> DatabaseBuildT:
         """
@@ -355,7 +340,6 @@ class DatabaseEngineSuper(
                 build = rbuild.DatabaseBuildAsync(self)
 
         return build
-
 
     @property
     def error(self):
@@ -376,7 +360,6 @@ class DatabaseEngineSuper(
 
         return error
 
-
     @property
     def config(self) -> DatabaseConfigT:
         """
@@ -395,7 +378,6 @@ class DatabaseEngineSuper(
                 config = rconfig.DatabaseConfigAsync(self)
 
         return config
-
 
     @property
     def catalog(self) -> DatabaseInformationCatalogT:
@@ -416,7 +398,6 @@ class DatabaseEngineSuper(
 
         return schema
 
-
     @property
     def param(self) -> DatabaseInformationParameterT:
         """
@@ -436,7 +417,6 @@ class DatabaseEngineSuper(
 
         return param
 
-
 class DatabaseEngine(
     DatabaseEngineSuper[
         Engine,
@@ -455,7 +435,6 @@ class DatabaseEngine(
     """
     Database engine type, based `PostgreSQL`.
     """
-
 
     @property
     def async_engine(self) -> 'DatabaseEngineAsync':
@@ -479,7 +458,6 @@ class DatabaseEngine(
         )
 
         return db
-
 
     def warm(self, num: int | None = None) -> None:
         """
@@ -511,7 +489,6 @@ class DatabaseEngine(
         ## Wait.
         pool.join()
 
-
 class DatabaseEngineAsync(
     DatabaseEngineSuper[
         AsyncEngine,
@@ -530,7 +507,6 @@ class DatabaseEngineAsync(
     """
     Asynchronous database engine type, based `PostgreSQL`.
     """
-
 
     @property
     def sync_engine(self) -> DatabaseEngine:
@@ -554,7 +530,6 @@ class DatabaseEngineAsync(
         )
 
         return db
-
 
     async def warm(self, num: int | None = None) -> None:
         """
@@ -591,7 +566,6 @@ class DatabaseEngineAsync(
             for conn in conns
         ]
         await async_gather(*coroutines)
-
 
     async def dispose(self) -> None:
         """

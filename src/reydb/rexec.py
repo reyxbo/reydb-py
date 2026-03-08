@@ -8,7 +8,6 @@
 @Explain : Execute methods.
 """
 
-
 from typing import Any, Literal, TypeVar, Generic, overload
 from collections.abc import Iterable, Generator, AsyncGenerator, Container
 from datetime import timedelta as Timedelta
@@ -25,7 +24,6 @@ from reykit.rwrap import wrap_runtime
 from . import rconn
 from .rbase import DatabaseBase, handle_sql_data
 
-
 __all__ = (
     'Result',
     'DatabaseExecuteSuper',
@@ -33,21 +31,17 @@ __all__ = (
     'DatabaseExecuteAsync'
 )
 
-
 # Monkey patch.
 _Result = monkey_sqlalchemy_result_more_fetch()
 Result = _Result
 monkey_sqlalchemy_row_index_field()
 
-
 DatabaseConnectionT = TypeVar('DatabaseConnectionT', 'rconn.DatabaseConnection', 'rconn.DatabaseConnectionAsync')
-
 
 class DatabaseExecuteSuper(DatabaseBase, Generic[DatabaseConnectionT]):
     """
     Database execute super type.
     """
-
 
     def __init__(self, dbconn: DatabaseConnectionT) -> None:
         """
@@ -60,7 +54,6 @@ class DatabaseExecuteSuper(DatabaseBase, Generic[DatabaseConnectionT]):
 
         # Build.
         self.conn = dbconn
-
 
     def handle_execute(
         self,
@@ -101,7 +94,6 @@ class DatabaseExecuteSuper(DatabaseBase, Generic[DatabaseConnectionT]):
         echo = get_first_notnone(echo, self.conn.engine.echo)
 
         return sql, data, echo
-
 
     def handle_select(
         self,
@@ -207,7 +199,6 @@ class DatabaseExecuteSuper(DatabaseBase, Generic[DatabaseConnectionT]):
         sql = '\n'.join(sql_list)
 
         return sql
-
 
     @overload
     def handle_insert(
@@ -380,7 +371,6 @@ class DatabaseExecuteSuper(DatabaseBase, Generic[DatabaseConnectionT]):
 
         return sql, kwdata_replace
 
-
     def handle_update(
         self,
         table: str,
@@ -471,7 +461,6 @@ class DatabaseExecuteSuper(DatabaseBase, Generic[DatabaseConnectionT]):
 
         return sql, data
 
-
     def handle_delete(
         self,
         table: str,
@@ -529,7 +518,6 @@ class DatabaseExecuteSuper(DatabaseBase, Generic[DatabaseConnectionT]):
         sqls = '\n'.join(sqls)
 
         return sqls
-
 
     def handle_copy(
         self,
@@ -608,12 +596,10 @@ class DatabaseExecuteSuper(DatabaseBase, Generic[DatabaseConnectionT]):
 
         return sql
 
-
 class DatabaseExecute(DatabaseExecuteSuper['rconn.DatabaseConnection']):
     """
     Database execute type.
     """
-
 
     def execute(
         self,
@@ -672,9 +658,7 @@ class DatabaseExecute(DatabaseExecuteSuper['rconn.DatabaseConnection']):
 
         return result
 
-
     __call__ = execute
-
 
     def select(
         self,
@@ -738,7 +722,6 @@ class DatabaseExecute(DatabaseExecuteSuper['rconn.DatabaseConnection']):
 
         return result
 
-
     def insert(
         self,
         table: str,
@@ -792,7 +775,6 @@ class DatabaseExecute(DatabaseExecuteSuper['rconn.DatabaseConnection']):
 
         return result
 
-
     def update(
         self,
         table: str,
@@ -833,7 +815,6 @@ class DatabaseExecute(DatabaseExecuteSuper['rconn.DatabaseConnection']):
         result = self.execute(sql, data, echo)
 
         return result
-
 
     def delete(
         self,
@@ -877,7 +858,6 @@ class DatabaseExecute(DatabaseExecuteSuper['rconn.DatabaseConnection']):
         result = self.execute(sql, echo=echo, **kwdata)
 
         return result
-
 
     def copy(
         self,
@@ -927,7 +907,6 @@ class DatabaseExecute(DatabaseExecuteSuper['rconn.DatabaseConnection']):
 
         return result
 
-
     def count(
         self,
         table: str,
@@ -966,7 +945,6 @@ class DatabaseExecute(DatabaseExecuteSuper['rconn.DatabaseConnection']):
         count = len(tuple(result))
 
         return count
-
 
     def exist(
         self,
@@ -1011,7 +989,6 @@ class DatabaseExecute(DatabaseExecuteSuper['rconn.DatabaseConnection']):
 
         return judge
 
-
     def generator(
         self,
         sql: str | TextClause,
@@ -1052,7 +1029,6 @@ class DatabaseExecute(DatabaseExecuteSuper['rconn.DatabaseConnection']):
         generator = func_generator.generator()
 
         return generator
-
 
     @overload
     def sleep(self, echo: bool | None = None) -> int: ...
@@ -1108,12 +1084,10 @@ class DatabaseExecute(DatabaseExecuteSuper['rconn.DatabaseConnection']):
 
         return second
 
-
 class DatabaseExecuteAsync(DatabaseExecuteSuper['rconn.DatabaseConnectionAsync']):
     """
     Asynchronous database execute type.
     """
-
 
     async def execute(
         self,
@@ -1186,9 +1160,7 @@ class DatabaseExecuteAsync(DatabaseExecuteSuper['rconn.DatabaseConnectionAsync']
 
         return result
 
-
     __call__ = execute
-
 
     async def select(
         self,
@@ -1252,7 +1224,6 @@ class DatabaseExecuteAsync(DatabaseExecuteSuper['rconn.DatabaseConnectionAsync']
 
         return result
 
-
     async def insert(
         self,
         table: str,
@@ -1306,7 +1277,6 @@ class DatabaseExecuteAsync(DatabaseExecuteSuper['rconn.DatabaseConnectionAsync']
 
         return result
 
-
     async def update(
         self,
         table: str,
@@ -1347,7 +1317,6 @@ class DatabaseExecuteAsync(DatabaseExecuteSuper['rconn.DatabaseConnectionAsync']
         result = await self.execute(sql, data, echo)
 
         return result
-
 
     async def delete(
         self,
@@ -1391,7 +1360,6 @@ class DatabaseExecuteAsync(DatabaseExecuteSuper['rconn.DatabaseConnectionAsync']
         result = await self.execute(sql, echo=echo, **kwdata)
 
         return result
-
 
     async def copy(
         self,
@@ -1441,7 +1409,6 @@ class DatabaseExecuteAsync(DatabaseExecuteSuper['rconn.DatabaseConnectionAsync']
 
         return result
 
-
     async def count(
         self,
         table: str,
@@ -1480,7 +1447,6 @@ class DatabaseExecuteAsync(DatabaseExecuteSuper['rconn.DatabaseConnectionAsync']
         count = len(tuple(result))
 
         return count
-
 
     async def exist(
         self,
@@ -1525,7 +1491,6 @@ class DatabaseExecuteAsync(DatabaseExecuteSuper['rconn.DatabaseConnectionAsync']
 
         return judge
 
-
     async def generator(
         self,
         sql: str | TextClause,
@@ -1565,7 +1530,6 @@ class DatabaseExecuteAsync(DatabaseExecuteSuper['rconn.DatabaseConnectionAsync']
         agenerator = func_generator.agenerator()
 
         return agenerator
-
 
     @overload
     async def sleep(self, echo: bool | None = None) -> int: ...

@@ -8,7 +8,6 @@
 @Explain : Base methods.
 """
 
-
 from typing import Any, TypedDict, Literal, TypeVar
 from enum import EnumType
 from sqlalchemy import Engine, Connection, Transaction, text as sqlalchemy_text, bindparam as sqlalchemy_bindparam
@@ -21,7 +20,6 @@ from reykit.rre import search
 from reykit.rdata import to_json
 from reykit.rre import findall
 
-
 __all__ = (
     'DatabaseBase',
     'handle_sql_data',
@@ -31,13 +29,11 @@ __all__ = (
     'is_multi_sql'
 )
 
-
 EngineT = TypeVar('EngineT', Engine, AsyncEngine)
 ConnectionT = TypeVar('ConnectionT', Connection, AsyncConnection)
 TransactionT = TypeVar('TransactionT', Transaction, AsyncTransaction)
 SessionT = TypeVar('SessionT', Session, AsyncSession)
 SessionTransactionT = TypeVar('SessionTransactionT', SessionTransaction, AsyncSessionTransaction)
-
 
 URLParameters = TypedDict(
     'URLParameters',
@@ -54,12 +50,10 @@ URLParameters = TypedDict(
     }
 )
 
-
 class DatabaseBase(Base):
     """
     Database base type.
     """
-
 
 def handle_sql_data(sql: str | TextClause, data: list[dict]) -> tuple[TextClause, list[dict]]:
     """
@@ -128,7 +122,6 @@ def handle_sql_data(sql: str | TextClause, data: list[dict]) -> tuple[TextClause
             row[key] = value
 
     return sql, data
-
 
 def extract_url(url: str | URL) -> URLParameters:
     """
@@ -219,7 +212,6 @@ def extract_url(url: str | URL) -> URLParameters:
 
     return params
 
-
 def extract_engine(engine: Engine | Connection) -> dict[
     Literal[
         'drivername', 'username', 'password', 'host', 'port', 'database', 'query',
@@ -273,7 +265,6 @@ def extract_engine(engine: Engine | Connection) -> dict[
 
     return params
 
-
 def get_syntax(self, sql: str | TextClause) -> list[str]:
     """
     Extract SQL syntax type for each segment form SQL.
@@ -299,7 +290,6 @@ def get_syntax(self, sql: str | TextClause) -> list[str]:
     ]
 
     return syntax
-
 
 def is_multi_sql(self, sql: str | TextClause) -> bool:
     """

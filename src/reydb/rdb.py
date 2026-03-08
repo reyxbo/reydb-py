@@ -8,7 +8,6 @@
 @Explain : Database methods.
 """
 
-
 from typing import Any, TypeVar, Generic, overload
 from collections.abc import Iterable, Sequence
 from reykit.rbase import Null, throw
@@ -17,22 +16,18 @@ from reykit.rtask import ThreadPool, async_gather
 from .rbase import DatabaseBase
 from .rengine import DatabaseEngine, DatabaseEngineAsync
 
-
 __all__ = (
     'DatabaseSuper',
     'Database',
     'DatabaseAsync'
 )
 
-
 DatabaseEngineT = TypeVar('DatabaseEngineT', DatabaseEngine, DatabaseEngineAsync)
-
 
 class DatabaseSuper(DatabaseBase, Generic[DatabaseEngineT]):
     """
     Database super type.
     """
-
 
     def __init__(self):
         """
@@ -41,7 +36,6 @@ class DatabaseSuper(DatabaseBase, Generic[DatabaseEngineT]):
 
         # Build.
         self.__engine_dict: dict[str, DatabaseEngineT] = {}
-
 
     @overload
     def __call__(
@@ -110,7 +104,6 @@ class DatabaseSuper(DatabaseBase, Generic[DatabaseEngineT]):
 
         return engine
 
-
     def __getattr__(self, database: str) -> DatabaseEngineT:
         """
         Get added database engine.
@@ -130,12 +123,10 @@ class DatabaseSuper(DatabaseBase, Generic[DatabaseEngineT]):
 
         return engine
 
-
     @overload
     def __getitem__(self, database: str) -> DatabaseEngineT: ...
 
     __getitem__ = __getattr__
-
 
     def __contains__(self, name: str) -> bool:
         """
@@ -151,7 +142,6 @@ class DatabaseSuper(DatabaseBase, Generic[DatabaseEngineT]):
 
         return result
 
-
     def __iter__(self) -> Iterable[str]:
         """
         Iterable of database engine names.
@@ -161,7 +151,6 @@ class DatabaseSuper(DatabaseBase, Generic[DatabaseEngineT]):
         names = iter(self.__engine_dict)
 
         return names
-
 
     def __repr__(self) -> str:
         """
@@ -173,12 +162,10 @@ class DatabaseSuper(DatabaseBase, Generic[DatabaseEngineT]):
 
         return text
 
-
 class Database(DatabaseSuper[DatabaseEngine]):
     """
     Database type.
     """
-
 
     def warm_all(self, num: int | None = None) -> None:
         """
@@ -211,12 +198,10 @@ class Database(DatabaseSuper[DatabaseEngine]):
         ## Wait.
         pool.join()
 
-
 class DatabaseAsync(DatabaseSuper[DatabaseEngineAsync]):
     """
     Asynchronous database type.
     """
-
 
     async def warm_all(self, num: int | None = None) -> None:
         """
@@ -242,7 +227,6 @@ class DatabaseAsync(DatabaseSuper[DatabaseEngineAsync]):
             for engine in engines
         ]
         await async_gather(*coroutines)
-
 
     async def dispose_all(self) -> None:
         """

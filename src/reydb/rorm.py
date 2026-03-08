@@ -8,7 +8,6 @@
 @Explain : Database ORM methods.
 """
 
-
 from typing import Self, Any, Type, Literal, TypeVar, Generic, Final, NoReturn, overload
 from collections.abc import Callable, Iterable
 from functools import wraps as functools_wraps
@@ -50,7 +49,6 @@ from .rbase import (
 )
 from .rexec import Result
 
-
 __all__ = (
     'DatabaseORMBase',
     'DatabaseORMModelMeta',
@@ -83,7 +81,6 @@ __all__ = (
     'DatabaseORMStatementDeleteAsync'
 )
 
-
 DatabaseEngineT = TypeVar('DatabaseEngineT', 'rengine.DatabaseEngine', 'rengine.DatabaseEngineAsync')
 DatabaseORMModelT = TypeVar('DatabaseORMModelT', bound='DatabaseORMModel')
 DatabaseORMT = TypeVar('DatabaseORMT', 'DatabaseORM', 'DatabaseORMAsync')
@@ -93,21 +90,17 @@ DatabaseORMStatementInsertT = TypeVar('DatabaseORMStatementInsertT', 'DatabaseOR
 DatabaseORMStatementUpdateT = TypeVar('DatabaseORMStatementUpdateT', 'DatabaseORMStatementUpdate', 'DatabaseORMStatementUpdateAsync')
 DatabaseORMStatementDeleteT = TypeVar('DatabaseORMStatementDeleteT', 'DatabaseORMStatementDelete', 'DatabaseORMStatementDeleteAsync')
 
-
 class DatabaseORMBase(DatabaseBase):
     """
     Database ORM base type.
     """
 
-
 _is_defined_class_model: bool = False
-
 
 class DatabaseORMModelMeta(DatabaseORMBase, SQLModelMetaclass):
     """
     Database ORM meta type.
     """
-
 
     def __new__(
         cls,
@@ -170,7 +163,6 @@ class DatabaseORMModelMeta(DatabaseORMBase, SQLModelMetaclass):
 
         return new_cls
 
-
     def __init__(
         cls,
         name: str,
@@ -199,7 +191,6 @@ class DatabaseORMModelMeta(DatabaseORMBase, SQLModelMetaclass):
                 index_name = '_'.join(names)
                 index.name = index_name
 
-
 class DatabaseORMModelField(DatabaseORMBase, FieldInfo):
     """
     Database ORM model filed type.
@@ -209,7 +200,6 @@ class DatabaseORMModelField(DatabaseORMBase, FieldInfo):
     >>> class Foo(DatabaseORMModel, table=True):
     ...     key: int = DatabaseORMModelField(key=True, commment='Field commment.')
     """
-
 
     @overload
     def __init__(
@@ -383,9 +373,7 @@ class DatabaseORMModelField(DatabaseORMBase, FieldInfo):
         # Super.
         super().__init__(**kwargs)
 
-
 model_metaclass: SQLModelMetaclass = DatabaseORMModelMeta
-
 
 class DatabaseORMModel(DatabaseORMBase, SQLModel, metaclass=model_metaclass):
     """
@@ -399,7 +387,6 @@ class DatabaseORMModel(DatabaseORMBase, SQLModel, metaclass=model_metaclass):
     ...     __comment__ = 'Table comment.'
     ...     ...
     """
-
 
     @classmethod
     def _get_table(cls_or_self) -> STable:
@@ -416,7 +403,6 @@ class DatabaseORMModel(DatabaseORMBase, SQLModel, metaclass=model_metaclass):
 
         return table
 
-
     @classmethod
     def _set_name(cls_or_self, name: str) -> None:
         """
@@ -427,7 +413,6 @@ class DatabaseORMModel(DatabaseORMBase, SQLModel, metaclass=model_metaclass):
         table = cls_or_self._get_table()
         table.name = name
 
-
     @classmethod
     def _set_comment(cls_or_self, comment: str) -> None:
         """
@@ -437,7 +422,6 @@ class DatabaseORMModel(DatabaseORMBase, SQLModel, metaclass=model_metaclass):
         # Get.
         table = cls_or_self._get_table()
         table.comment = comment
-
 
     @property
     def _m(self):
@@ -454,7 +438,6 @@ class DatabaseORMModel(DatabaseORMBase, SQLModel, metaclass=model_metaclass):
 
         return method
 
-
 class DatabaseORMModelTable(DatabaseORMModel):
     """
     Database ORM table model type.
@@ -468,7 +451,6 @@ class DatabaseORMModelTable(DatabaseORMModel):
     ...     ...
     """
 
-
 class DatabaseORMModelView(DatabaseORMModel):
     """
     Database ORM view model type.
@@ -480,7 +462,6 @@ class DatabaseORMModelView(DatabaseORMModel):
     ...     __name__ = 'View name, default is class name.'
     ...     ...
     """
-
 
 class DatabaseORMModelViewStats(DatabaseORMModelView):
     """
@@ -498,15 +479,12 @@ class DatabaseORMModelViewStats(DatabaseORMModelView):
     value: str
     comment: str
 
-
 _is_defined_class_model = True
-
 
 class DatabaseORMModelMethod(DatabaseORMBase):
     """
     Database ORM model method type.
     """
-
 
     def __init__(self, model: DatabaseORMModel) -> None:
         """
@@ -519,7 +497,6 @@ class DatabaseORMModelMethod(DatabaseORMBase):
 
         # Build.
         self.model = model
-
 
     @property
     def data(self) -> dict[str, Any]:
@@ -536,7 +513,6 @@ class DatabaseORMModelMethod(DatabaseORMBase):
 
         return data
 
-
     def update(self, data: 'DatabaseORMModel | dict[dict, Any]') -> None:
         """
         Update attributes.
@@ -549,7 +525,6 @@ class DatabaseORMModelMethod(DatabaseORMBase):
         # Update.
         self.model.sqlmodel_update(data)
 
-
     def validate(self) -> Self:
         """
         Validate all attributes, and copy self instance to new instance.
@@ -559,7 +534,6 @@ class DatabaseORMModelMethod(DatabaseORMBase):
         model = self.model.model_validate(self.model)
 
         return model
-
 
     def copy(self) -> Self:
         """
@@ -576,12 +550,10 @@ class DatabaseORMModelMethod(DatabaseORMBase):
 
         return instance
 
-
 class DatabaseORMSuper(DatabaseORMBase, Generic[DatabaseEngineT, DatabaseORMSessionT]):
     """
     Database ORM super type.
     """
-
 
     def __init__(self, engine: DatabaseEngineT) -> None:
         """
@@ -608,7 +580,6 @@ class DatabaseORMSuper(DatabaseORMBase, Generic[DatabaseEngineT, DatabaseORMSess
         self.update = self.__sess.update
         self.delete = self.__sess.delete
 
-
     def session(self, autocommit: bool = False) -> DatabaseORMSessionT:
         """
         Build DataBase ORM session instance.
@@ -631,18 +602,15 @@ class DatabaseORMSuper(DatabaseORMBase, Generic[DatabaseEngineT, DatabaseORMSess
 
         return sess
 
-
 class DatabaseORM(DatabaseORMSuper['rengine.DatabaseEngine', 'DatabaseORMSession']):
     """
     Database ORM type.
     """
 
-
 class DatabaseORMAsync(DatabaseORMSuper['rengine.DatabaseEngineAsync', 'DatabaseORMSessionAsync']):
     """
     Asynchronous database ORM type.
     """
-
 
 class DatabaseORMSessionSuper(
     DatabaseORMBase,
@@ -659,7 +627,6 @@ class DatabaseORMSessionSuper(
     """
     Database ORM session super type.
     """
-
 
     def __init__(
         self,
@@ -680,7 +647,6 @@ class DatabaseORMSessionSuper(
         self.autocommit = autocommit
         self.session: SessionT | None = None
         self.begin: SessionTransactionT | None = None
-
 
     def select(self, model: type[DatabaseORMModelT] | DatabaseORMModelT) -> DatabaseORMStatementSelectT:
         """
@@ -708,7 +674,6 @@ class DatabaseORMSessionSuper(
 
         return select
 
-
     def insert(self, model: type[DatabaseORMModelT] | DatabaseORMModelT) -> DatabaseORMStatementInsertT:
         """
         Build database ORM insert instance.
@@ -734,7 +699,6 @@ class DatabaseORMSessionSuper(
                 insert = DatabaseORMStatementInsertAsync(self, model)
 
         return insert
-
 
     def update(self, model: type[DatabaseORMModelT] | DatabaseORMModelT) -> DatabaseORMStatementUpdateT:
         """
@@ -762,7 +726,6 @@ class DatabaseORMSessionSuper(
 
         return update
 
-
     def delete(self, model: type[DatabaseORMModelT] | DatabaseORMModelT) -> DatabaseORMStatementDeleteT:
         """
         Build database ORM delete instance.
@@ -789,7 +752,6 @@ class DatabaseORMSessionSuper(
 
         return delete
 
-
 class DatabaseORMSession(
     DatabaseORMSessionSuper[
         DatabaseORM,
@@ -805,7 +767,6 @@ class DatabaseORMSession(
     Database ORM session type.
     """
 
-
     def __enter__(self) -> Self:
         """
         Enter syntax `with`.
@@ -816,7 +777,6 @@ class DatabaseORMSession(
         """
 
         return self
-
 
     def __exit__(
         self,
@@ -838,7 +798,6 @@ class DatabaseORMSession(
         # Close.
         self.close()
 
-
     def get_sess(self) -> Session:
         """
         Get `Session` instance.
@@ -853,7 +812,6 @@ class DatabaseORMSession(
             self.session = Session(self.orm.engine.engine)
 
         return self.session
-
 
     def get_begin(self) -> SessionTransaction:
         """
@@ -871,7 +829,6 @@ class DatabaseORMSession(
 
         return self.begin
 
-
     def commit(self) -> None:
         """
         Commit cumulative executions.
@@ -882,7 +839,6 @@ class DatabaseORMSession(
             self.begin.commit()
             self.begin = None
 
-
     def rollback(self) -> None:
         """
         Rollback cumulative executions.
@@ -892,7 +848,6 @@ class DatabaseORMSession(
         if self.begin is not None:
             self.begin.rollback()
             self.begin = None
-
 
     def close(self) -> None:
         """
@@ -907,7 +862,6 @@ class DatabaseORMSession(
             self.session.close()
             self.session = None
 
-
     def flush(self) -> None:
         """
         Send execution to database, can refresh increment primary key attribute value of model.
@@ -915,7 +869,6 @@ class DatabaseORMSession(
 
         # Send.
         self.session.flush()
-
 
     def wrap_transact(method: CallableT) -> CallableT:
         """
@@ -929,7 +882,6 @@ class DatabaseORMSession(
         -------
         Decorated method.
         """
-
 
         @functools_wraps(method)
         def wrap(self: 'DatabaseORMSession', *args, **kwargs):
@@ -952,9 +904,7 @@ class DatabaseORMSession(
 
             return result
 
-
         return wrap
-
 
     @wrap_transact
     def create(
@@ -984,7 +934,6 @@ class DatabaseORMSession(
         # Create.
         metadata.create_all(self.orm.engine.engine, tables, skip)
 
-
     @wrap_transact
     def drop(
         self,
@@ -1012,7 +961,6 @@ class DatabaseORMSession(
 
         # Drop.
         metadata.drop_all(self.orm.engine.engine, tables, skip)
-
 
     @wrap_transact
     def get(self, model: type[DatabaseORMModelT] | DatabaseORMModelT, key: Any | tuple[Any]) -> DatabaseORMModelT | None:
@@ -1047,7 +995,6 @@ class DatabaseORMSession(
 
         return result
 
-
     @wrap_transact
     def gets(self, model: type[DatabaseORMModelT] | DatabaseORMModelT, *keys: Any | tuple[Any]) -> list[DatabaseORMModelT]:
         """
@@ -1078,7 +1025,6 @@ class DatabaseORMSession(
 
         return results
 
-
     @wrap_transact
     def all(self, model: type[DatabaseORMModelT] | DatabaseORMModelT) -> list[DatabaseORMModelT]:
         """
@@ -1104,7 +1050,6 @@ class DatabaseORMSession(
 
         return models
 
-
     @wrap_transact
     def add(self, *models: DatabaseORMModel) -> None:
         """
@@ -1117,7 +1062,6 @@ class DatabaseORMSession(
 
         # Add.
         self.session.add_all(models)
-
 
     @wrap_transact
     def rm(self, *models: DatabaseORMModel) -> None:
@@ -1133,7 +1077,6 @@ class DatabaseORMSession(
         for model in models:
             self.session.delete(model)
 
-
     @wrap_transact
     def refresh(self, *models: DatabaseORMModel) -> None:
         """
@@ -1147,7 +1090,6 @@ class DatabaseORMSession(
         # Refresh.
         for model in models:
             self.session.refresh(model)
-
 
     @wrap_transact
     def expire(self, *models: DatabaseORMModel) -> None:
@@ -1163,12 +1105,10 @@ class DatabaseORMSession(
         for model in models:
             self.session.expire(model)
 
-
     @overload
     def select(self, model: type[DatabaseORMModelT] | DatabaseORMModelT) -> 'DatabaseORMStatementSelect[DatabaseORMModelT]': ...
 
     select = DatabaseORMSessionSuper.select
-
 
 class DatabaseORMSessionAsync(
     DatabaseORMSessionSuper[
@@ -1185,7 +1125,6 @@ class DatabaseORMSessionAsync(
     Asynchronous database ORM session type.
     """
 
-
     async def __aenter__(self) -> Self:
         """
         Asynchronous enter syntax `with`.
@@ -1196,7 +1135,6 @@ class DatabaseORMSessionAsync(
         """
 
         return self
-
 
     async def __aexit__(
         self,
@@ -1218,7 +1156,6 @@ class DatabaseORMSessionAsync(
         # Close.
         await self.close()
 
-
     def get_sess(self) -> AsyncSession:
         """
         Get `AsyncSession` instance.
@@ -1233,7 +1170,6 @@ class DatabaseORMSessionAsync(
             self.session = AsyncSession(self.orm.engine.engine)
 
         return self.session
-
 
     async def get_begin(self) -> AsyncSessionTransaction:
         """
@@ -1251,7 +1187,6 @@ class DatabaseORMSessionAsync(
 
         return self.begin
 
-
     async def commit(self) -> None:
         """
         Asynchronous commit cumulative executions.
@@ -1262,7 +1197,6 @@ class DatabaseORMSessionAsync(
             await self.begin.commit()
             self.begin = None
 
-
     async def rollback(self) -> None:
         """
         Asynchronous rollback cumulative executions.
@@ -1272,7 +1206,6 @@ class DatabaseORMSessionAsync(
         if self.begin is not None:
             await self.begin.rollback()
             self.begin = None
-
 
     async def close(self) -> None:
         """
@@ -1287,7 +1220,6 @@ class DatabaseORMSessionAsync(
             await self.session.close()
             self.session = None
 
-
     async def flush(self) -> None:
         """
         Asynchronous send execution to database, can refresh increment primary key attribute value of model.
@@ -1295,7 +1227,6 @@ class DatabaseORMSessionAsync(
 
         # Send.
         await self.session.flush()
-
 
     def wrap_transact(method: CallableT) -> CallableT:
         """
@@ -1309,7 +1240,6 @@ class DatabaseORMSessionAsync(
         -------
         Decorated method.
         """
-
 
         @functools_wraps(method)
         async def wrap(self: 'DatabaseORMSessionAsync', *args, **kwargs):
@@ -1330,9 +1260,7 @@ class DatabaseORMSessionAsync(
 
             return result
 
-
         return wrap
-
 
     @wrap_transact
     async def create(
@@ -1363,7 +1291,6 @@ class DatabaseORMSessionAsync(
         conn = await self.session.connection()
         await conn.run_sync(metadata.create_all, tables, skip)
 
-
     @wrap_transact
     async def drop(
         self,
@@ -1392,7 +1319,6 @@ class DatabaseORMSessionAsync(
         # Drop.
         conn = await self.session.connection()
         await conn.run_sync(metadata.drop_all, tables, skip)
-
 
     @wrap_transact
     async def get(self, model: type[DatabaseORMModelT] | DatabaseORMModelT, key: Any | tuple[Any]) -> DatabaseORMModelT | None:
@@ -1427,7 +1353,6 @@ class DatabaseORMSessionAsync(
 
         return result
 
-
     @wrap_transact
     async def gets(self, model: type[DatabaseORMModelT] | DatabaseORMModelT, *keys: Any | tuple[Any]) -> list[DatabaseORMModelT]:
         """
@@ -1458,7 +1383,6 @@ class DatabaseORMSessionAsync(
 
         return results
 
-
     @wrap_transact
     async def all(self, model: type[DatabaseORMModelT] | DatabaseORMModelT) -> list[DatabaseORMModelT]:
         """
@@ -1484,7 +1408,6 @@ class DatabaseORMSessionAsync(
 
         return models
 
-
     @wrap_transact
     async def add(self, *models: DatabaseORMModel) -> None:
         """
@@ -1497,7 +1420,6 @@ class DatabaseORMSessionAsync(
 
         # Add.
         self.session.add_all(models)
-
 
     @wrap_transact
     async def rm(self, *models: DatabaseORMModel) -> None:
@@ -1513,7 +1435,6 @@ class DatabaseORMSessionAsync(
         for model in models:
             await self.session.delete(model)
 
-
     @wrap_transact
     async def refresh(self, *models: DatabaseORMModel) -> None:
         """
@@ -1527,7 +1448,6 @@ class DatabaseORMSessionAsync(
         # Refresh.
         for model in models:
             await self.session.refresh(model)
-
 
     @wrap_transact
     async def expire(self, *models: DatabaseORMModel) -> None:
@@ -1543,18 +1463,15 @@ class DatabaseORMSessionAsync(
         for model in models:
             self.session.expire(model)
 
-
     @overload
     def select(self, model: type[DatabaseORMModelT] | DatabaseORMModelT) -> 'DatabaseORMStatementSelectAsync[DatabaseORMModelT]': ...
 
     select = DatabaseORMSessionSuper.select
 
-
 class DatabaseORMStatementSuper(DatabaseORMBase, Generic[DatabaseORMSessionT]):
     """
     Database ORM statement super type.
     """
-
 
     def __init__(
         self,
@@ -1577,16 +1494,13 @@ class DatabaseORMStatementSuper(DatabaseORMBase, Generic[DatabaseORMSessionT]):
         self.sess = sess
         self.model = model
 
-
     @overload
     def with_only_columns(self) -> NoReturn: ...
-
 
 class DatabaseORMStatement(DatabaseORMStatementSuper[DatabaseORMSession]):
     """
     Database ORM statement type.
     """
-
 
     def execute(self) -> Result:
         """
@@ -1626,12 +1540,10 @@ class DatabaseORMStatement(DatabaseORMStatementSuper[DatabaseORMSession]):
 
         return result
 
-
 class DatabaseORMStatementAsync(DatabaseORMStatementSuper[DatabaseORMSessionAsync]):
     """
     Asynchronous dtabase ORM statement type.
     """
-
 
     async def execute(self) -> Result:
         """
@@ -1671,7 +1583,6 @@ class DatabaseORMStatementAsync(DatabaseORMStatementSuper[DatabaseORMSessionAsyn
 
         return result
 
-
 class DatabaseORMStatementSelectSuper(DatabaseORMStatementSuper, Select):
     """
     Database ORM `select` statement super type.
@@ -1679,7 +1590,6 @@ class DatabaseORMStatementSelectSuper(DatabaseORMStatementSuper, Select):
 
     inherit_cache: Final = True
     'Compatible type.'
-
 
     def fields(self, *names: str) -> Self:
         """
@@ -1703,7 +1613,6 @@ class DatabaseORMStatementSelectSuper(DatabaseORMStatementSuper, Select):
         select = self.options(set)
 
         return select
-
 
     def where(self, *clauses: str | _ColumnExpressionArgument[bool]) -> Self:
         """
@@ -1733,7 +1642,6 @@ class DatabaseORMStatementSelectSuper(DatabaseORMStatementSuper, Select):
 
         return stmt
 
-
 class DatabaseORMStatementSelect(DatabaseORMStatement, DatabaseORMStatementSelectSuper, Generic[DatabaseORMModelT]):
     """
     Database ORM `select` statement type.
@@ -1742,12 +1650,10 @@ class DatabaseORMStatementSelect(DatabaseORMStatement, DatabaseORMStatementSelec
     inherit_cache: Final = True
     'Compatible type.'
 
-
     @overload
     def execute(self) -> list[DatabaseORMModelT]: ...
 
     execute = DatabaseORMStatement.execute
-
 
 class DatabaseORMStatementSelectAsync(DatabaseORMStatementAsync, DatabaseORMStatementSelectSuper, Generic[DatabaseORMModelT]):
     """
@@ -1757,12 +1663,10 @@ class DatabaseORMStatementSelectAsync(DatabaseORMStatementAsync, DatabaseORMStat
     inherit_cache: Final = True
     'Compatible type.'
 
-
     @overload
     async def execute(self) -> list[DatabaseORMModelT]: ...
 
     execute = DatabaseORMStatementAsync.execute
-
 
 class DatabaseORMStatementInsertSuper(DatabaseORMStatementSuper, Insert):
     """
@@ -1771,7 +1675,6 @@ class DatabaseORMStatementInsertSuper(DatabaseORMStatementSuper, Insert):
 
     inherit_cache: Final = True
     'Compatible type.'
-
 
     def values(self, data: TableData) -> Self:
         """
@@ -1799,7 +1702,6 @@ class DatabaseORMStatementInsertSuper(DatabaseORMStatementSuper, Insert):
 
         return insert
 
-
     def nothing(self, conflict: str | Iterable[str]) -> Self:
         """
         Add `ON CONFLICT ... ON NOTHING` syntax.
@@ -1821,7 +1723,6 @@ class DatabaseORMStatementInsertSuper(DatabaseORMStatementSuper, Insert):
         insert = self.on_conflict_do_nothing(index_elements=conflict)
 
         return insert
-
 
     def update(
         self,
@@ -1867,7 +1768,6 @@ class DatabaseORMStatementInsertSuper(DatabaseORMStatementSuper, Insert):
 
         return insert
 
-
 class DatabaseORMStatementInsert(DatabaseORMStatement, DatabaseORMStatementInsertSuper):
     """
     Database ORM `insert` statement type.
@@ -1875,7 +1775,6 @@ class DatabaseORMStatementInsert(DatabaseORMStatement, DatabaseORMStatementInser
 
     inherit_cache: Final = True
     'Compatible type.'
-
 
 class DatabaseORMStatementInsertAsync(DatabaseORMStatementAsync, DatabaseORMStatementInsertSuper):
     """
@@ -1885,7 +1784,6 @@ class DatabaseORMStatementInsertAsync(DatabaseORMStatementAsync, DatabaseORMStat
     inherit_cache: Final = True
     'Compatible type.'
 
-
 class DatabaseORMStatementUpdateSuper(DatabaseORMStatementSuper, Update):
     """
     Database ORM `update` statement super type.
@@ -1893,7 +1791,6 @@ class DatabaseORMStatementUpdateSuper(DatabaseORMStatementSuper, Update):
 
     inherit_cache: Final = True
     'Compatible type.'
-
 
     def where(self, *clauses: str | _ColumnExpressionArgument[bool]) -> Self:
         """
@@ -1922,7 +1819,6 @@ class DatabaseORMStatementUpdateSuper(DatabaseORMStatementSuper, Update):
         stmt = super().where(*clauses)
 
         return stmt
-
 
 class DatabaseORMStatementUpdate(DatabaseORMStatement, DatabaseORMStatementUpdateSuper):
     """
@@ -1932,7 +1828,6 @@ class DatabaseORMStatementUpdate(DatabaseORMStatement, DatabaseORMStatementUpdat
     inherit_cache: Final = True
     'Compatible type.'
 
-
 class DatabaseORMStatementUpdateAsync(DatabaseORMStatementAsync, DatabaseORMStatementUpdateSuper):
     """
     Asynchronous database ORM `update` statement type.
@@ -1941,7 +1836,6 @@ class DatabaseORMStatementUpdateAsync(DatabaseORMStatementAsync, DatabaseORMStat
     inherit_cache: Final = True
     'Compatible type.'
 
-
 class DatabaseORMStatementDeleteSuper(DatabaseORMStatementSuper, Delete):
     """
     Database ORM `delete` statement super type.
@@ -1949,7 +1843,6 @@ class DatabaseORMStatementDeleteSuper(DatabaseORMStatementSuper, Delete):
 
     inherit_cache: Final = True
     'Compatible type.'
-
 
     def where(self, *clauses: str | _ColumnExpressionArgument[bool]) -> Self:
         """
@@ -1979,7 +1872,6 @@ class DatabaseORMStatementDeleteSuper(DatabaseORMStatementSuper, Delete):
 
         return stmt
 
-
 class DatabaseORMStatementDelete(DatabaseORMStatement, DatabaseORMStatementDeleteSuper):
     """
     Database ORM `delete` statement type.
@@ -1988,7 +1880,6 @@ class DatabaseORMStatementDelete(DatabaseORMStatement, DatabaseORMStatementDelet
     inherit_cache: Final = True
     'Compatible type.'
 
-
 class DatabaseORMStatementDeleteAsync(DatabaseORMStatementAsync, DatabaseORMStatementDeleteSuper):
     """
     Asynchronous database ORM `delete` statement type.
@@ -1996,7 +1887,6 @@ class DatabaseORMStatementDeleteAsync(DatabaseORMStatementAsync, DatabaseORMStat
 
     inherit_cache: Final = True
     'Compatible type.'
-
 
 # Simple path.
 

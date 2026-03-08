@@ -8,7 +8,6 @@
 @Explain : Database build methods.
 """
 
-
 from typing import TypedDict, NotRequired, Literal, Type, TypeVar, Generic
 from copy import deepcopy
 from sqlalchemy import UniqueConstraint
@@ -19,13 +18,11 @@ from . import rengine
 from . import rorm
 from .rbase import DatabaseBase
 
-
 __all__ = (
     'DatabaseBuildSuper',
     'DatabaseBuild',
     'DatabaseBuildAsync'
 )
-
 
 FieldSet = TypedDict(
     'FieldSet',
@@ -49,12 +46,10 @@ IndexSet = TypedDict(
 )
 DatabaseEngineT = TypeVar('DatabaseEngineT', 'rengine.DatabaseEngine', 'rengine.DatabaseEngineAsync')
 
-
 class DatabaseBuildSuper(DatabaseBase, Generic[DatabaseEngineT]):
     """
     Database build super type.
     """
-
 
     def __init__(self, engine: DatabaseEngineT) -> None:
         """
@@ -67,7 +62,6 @@ class DatabaseBuildSuper(DatabaseBase, Generic[DatabaseEngineT]):
 
         # Set attribute.
         self.engine = engine
-
 
     def get_sql_create_database(
         self,
@@ -94,7 +88,6 @@ class DatabaseBuildSuper(DatabaseBase, Generic[DatabaseEngineT]):
         sql = f'CREATE DATABASE "{name}" CHARACTER SET {character} COLLATE {collate}'
 
         return sql
-
 
     def __get_field_sql(
         self,
@@ -152,7 +145,6 @@ class DatabaseBuildSuper(DatabaseBase, Generic[DatabaseEngineT]):
         sql = f'{old_name}"{name}" {type_}{constraint}{comment}{position}'
 
         return sql
-
 
     def __get_index_sql(
         self,
@@ -213,7 +205,6 @@ class DatabaseBuildSuper(DatabaseBase, Generic[DatabaseEngineT]):
         sql = f'{type_} "{name}" ({sql_fields}){method}{comment}'
 
         return sql
-
 
     def get_sql_create_table(
         self,
@@ -336,7 +327,6 @@ class DatabaseBuildSuper(DatabaseBase, Generic[DatabaseEngineT]):
 
         return sql
 
-
     def get_sql_create_view(
         self,
         table: str,
@@ -361,7 +351,6 @@ class DatabaseBuildSuper(DatabaseBase, Generic[DatabaseEngineT]):
         sql = f'CREATE VIEW "{table}" AS (\n    {select}\n)'
 
         return sql
-
 
     def get_sql_create_view_stats(
         self,
@@ -424,7 +413,6 @@ class DatabaseBuildSuper(DatabaseBase, Generic[DatabaseEngineT]):
 
         return sql
 
-
     def get_sql_drop_database(
         self,
         database: str
@@ -446,7 +434,6 @@ class DatabaseBuildSuper(DatabaseBase, Generic[DatabaseEngineT]):
         sql = f'DROP DATABASE "{database}"'
 
         return sql
-
 
     def get_sql_drop_table(
         self,
@@ -470,7 +457,6 @@ class DatabaseBuildSuper(DatabaseBase, Generic[DatabaseEngineT]):
 
         return sql
 
-
     def get_sql_drop_view(
         self,
         table: str
@@ -492,7 +478,6 @@ class DatabaseBuildSuper(DatabaseBase, Generic[DatabaseEngineT]):
         sql = f'DROP VIEW "{table}"'
 
         return sql
-
 
     def get_sql_alter_database(
         self,
@@ -537,7 +522,6 @@ class DatabaseBuildSuper(DatabaseBase, Generic[DatabaseEngineT]):
         sql = f'ALTER DATABASE "{database}"{sql_character}{sql_collate}'
 
         return sql
-
 
     def get_sql_alter_table_add(
         self,
@@ -645,7 +629,6 @@ class DatabaseBuildSuper(DatabaseBase, Generic[DatabaseEngineT]):
 
         return sql
 
-
     def get_sql_alter_table_drop(
         self,
         table: str,
@@ -707,7 +690,6 @@ class DatabaseBuildSuper(DatabaseBase, Generic[DatabaseEngineT]):
         )
 
         return sql
-
 
     def get_sql_alter_table_change(
         self,
@@ -819,7 +801,6 @@ class DatabaseBuildSuper(DatabaseBase, Generic[DatabaseEngineT]):
 
         return sql
 
-
     def get_sql_alter_view(
         self,
         table: str,
@@ -844,7 +825,6 @@ class DatabaseBuildSuper(DatabaseBase, Generic[DatabaseEngineT]):
 
         return sql
 
-
     def get_sql_truncate_table(
         self,
         table: str
@@ -866,7 +846,6 @@ class DatabaseBuildSuper(DatabaseBase, Generic[DatabaseEngineT]):
         sql = f'TRUNCATE TABLE "{table}"'
 
         return sql
-
 
     def input_confirm_build(
         self,
@@ -906,7 +885,6 @@ class DatabaseBuildSuper(DatabaseBase, Generic[DatabaseEngineT]):
                 case _:
                     text = 'Incorrect input, reenter. (y/n) '
                     command = input(text)
-
 
     def get_orm_table_text(self, model: rorm.Model) -> str:
         """
@@ -990,12 +968,10 @@ class DatabaseBuildSuper(DatabaseBase, Generic[DatabaseEngineT]):
 
         return text
 
-
 class DatabaseBuild(DatabaseBuildSuper['rengine.DatabaseEngine']):
     """
     Database build type.
     """
-
 
     def create_orm_table(
         self,
@@ -1014,7 +990,6 @@ class DatabaseBuild(DatabaseBuildSuper['rengine.DatabaseEngine']):
         # Create.
         self.engine.orm.create(*models, skip=skip)
 
-
     def drop_orm_table(
         self,
         *models: type[rorm.Model] | rorm.Model,
@@ -1031,7 +1006,6 @@ class DatabaseBuild(DatabaseBuildSuper['rengine.DatabaseEngine']):
 
         # Drop.
         self.engine.orm.drop(*models, skip=skip)
-
 
     def build(
         self,
@@ -1186,15 +1160,12 @@ class DatabaseBuild(DatabaseBuildSuper['rengine.DatabaseEngine']):
         if refresh_schema:
             self.engine.catalog()
 
-
     __call__ = build
-
 
 class DatabaseBuildAsync(DatabaseBuildSuper['rengine.DatabaseEngineAsync']):
     """
     Asynchronous database build type.
     """
-
 
     async def create_orm_table(
         self,
@@ -1213,7 +1184,6 @@ class DatabaseBuildAsync(DatabaseBuildSuper['rengine.DatabaseEngineAsync']):
         # Create.
         await self.engine.orm.create(*models, skip=skip)
 
-
     async def drop_orm_table(
         self,
         *models: type[rorm.Model] | rorm.Model,
@@ -1230,7 +1200,6 @@ class DatabaseBuildAsync(DatabaseBuildSuper['rengine.DatabaseEngineAsync']):
 
         # Drop.
         await self.engine.orm.drop(*models, skip=skip)
-
 
     async def build(
         self,
@@ -1386,6 +1355,5 @@ class DatabaseBuildAsync(DatabaseBuildSuper['rengine.DatabaseEngineAsync']):
         # Refresh schema.
         if refresh_schema:
             self.engine.catalog()
-
 
     __call__ = build

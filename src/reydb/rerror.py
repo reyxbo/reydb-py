@@ -8,7 +8,6 @@
 @Explain : Database error methods.
 """
 
-
 from typing import Any, NoReturn, TypeVar, Generic
 from collections.abc import Callable
 from inspect import iscoroutinefunction
@@ -20,7 +19,6 @@ from . import rengine
 from . import rorm
 from .rbase import DatabaseBase
 
-
 __all__ = (
     'DatabaseORMTableError',
     'DatabaseErrorSuper',
@@ -28,9 +26,7 @@ __all__ = (
     'DatabaseErrorAsync'
 )
 
-
 DatabaseEngineT = TypeVar('DatabaseEngineT', 'rengine.DatabaseEngine', 'rengine.DatabaseEngineAsync')
-
 
 class DatabaseORMTableError(rorm.Table):
     """
@@ -46,7 +42,6 @@ class DatabaseORMTableError(rorm.Table):
     stack: str = rorm.Field(rorm.JSONB, comment='Error code traceback stack.')
     note: str = rorm.Field(rorm.types.VARCHAR(500), comment='Error note.')
 
-
 class DatabaseErrorSuper(DatabaseBase, Generic[DatabaseEngineT]):
     """
     Database error super type.
@@ -54,7 +49,6 @@ class DatabaseErrorSuper(DatabaseBase, Generic[DatabaseEngineT]):
     """
 
     _checked: bool = False
-
 
     def __init__(self, engine: DatabaseEngineT) -> None:
         """
@@ -75,7 +69,6 @@ class DatabaseErrorSuper(DatabaseBase, Generic[DatabaseEngineT]):
             elif type(self) == DatabaseErrorAsync:
                 engine.sync_database.error.build_db()
             self._checked = True
-
 
     def handle_build_db(self) -> tuple[list[type[DatabaseORMTableError]], list[dict[str, Any]]]:
         """
@@ -146,7 +139,6 @@ class DatabaseErrorSuper(DatabaseBase, Generic[DatabaseEngineT]):
 
         return tables, views_stats
 
-
     def handle_record(
         self,
         exc: BaseException,
@@ -184,13 +176,11 @@ class DatabaseErrorSuper(DatabaseBase, Generic[DatabaseEngineT]):
 
         return data
 
-
 class DatabaseError(DatabaseErrorSuper['rengine.DatabaseEngine']):
     """
     Database error type.
     Can create database used "self.build_db" method.
     """
-
 
     def build_db(self) -> None:
         """
@@ -202,7 +192,6 @@ class DatabaseError(DatabaseErrorSuper['rengine.DatabaseEngine']):
 
         # Build.
         self.engine.build.build(tables=tables, views_stats=views_stats, skip=True)
-
 
     def record(
         self,
@@ -229,9 +218,7 @@ class DatabaseError(DatabaseErrorSuper['rengine.DatabaseEngine']):
             data=data
         )
 
-
     __call__ = record
-
 
     def record_catch(
         self,
@@ -261,7 +248,6 @@ class DatabaseError(DatabaseErrorSuper['rengine.DatabaseEngine']):
 
         # Throw exception.
         raise
-
 
     def wrap(
         self,
@@ -308,7 +294,6 @@ class DatabaseError(DatabaseErrorSuper['rengine.DatabaseEngine']):
         if issubclass(filter_type, BaseException):
             filter_type = (filter_type,)
 
-
         def _wrap(func_: Callable[..., T]) -> Callable[..., T]:
             """
             Decorator, insert exception information into the table of database.
@@ -321,7 +306,6 @@ class DatabaseError(DatabaseErrorSuper['rengine.DatabaseEngine']):
             -------
             Decorated function.
             """
-
 
             @functools_wraps(func_)
             def _func(*args, **kwargs) -> Any:
@@ -348,9 +332,7 @@ class DatabaseError(DatabaseErrorSuper['rengine.DatabaseEngine']):
 
                 return result
 
-
             return _func
-
 
         # Decorator.
         if func is None:
@@ -361,13 +343,11 @@ class DatabaseError(DatabaseErrorSuper['rengine.DatabaseEngine']):
             _func = _wrap(func)
             return _func
 
-
 class DatabaseErrorAsync(DatabaseErrorSuper['rengine.DatabaseEngineAsync']):
     """
     Asynchronous database error type.
     Can create database used "self.build_db" method.
     """
-
 
     async def build_db(self) -> None:
         """
@@ -379,7 +359,6 @@ class DatabaseErrorAsync(DatabaseErrorSuper['rengine.DatabaseEngineAsync']):
 
         # Build.
         await self.engine.build.build(tables=tables, views_stats=views_stats, skip=True)
-
 
     async def record(
         self,
@@ -406,9 +385,7 @@ class DatabaseErrorAsync(DatabaseErrorSuper['rengine.DatabaseEngineAsync']):
             data=data
         )
 
-
     __call__ = record
-
 
     async def record_catch(
         self,
@@ -438,7 +415,6 @@ class DatabaseErrorAsync(DatabaseErrorSuper['rengine.DatabaseEngineAsync']):
 
         # Throw exception.
         raise
-
 
     def wrap(
         self,
@@ -487,7 +463,6 @@ class DatabaseErrorAsync(DatabaseErrorSuper['rengine.DatabaseEngineAsync']):
         if issubclass(filter_type, BaseException):
             filter_type = (filter_type,)
 
-
         def _wrap(func_: Callable[..., T]) -> Callable[..., T]:
             """
             Decorator, insert exception information into the table of database.
@@ -500,7 +475,6 @@ class DatabaseErrorAsync(DatabaseErrorSuper['rengine.DatabaseEngineAsync']):
             -------
             Decorated function.
             """
-
 
             @functools_wraps(func_)
             async def _func(*args, **kwargs) -> Any:
@@ -530,9 +504,7 @@ class DatabaseErrorAsync(DatabaseErrorSuper['rengine.DatabaseEngineAsync']):
 
                 return result
 
-
             return _func
-
 
         # Decorator.
         if func is None:

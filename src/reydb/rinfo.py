@@ -8,13 +8,11 @@
 @Explain : Database information methods.
 """
 
-
 from typing import Literal, TypeVar, Generic, Final, overload
 
 from . import rengine
 from .rbase import DatabaseBase
 from .rexec import Result
-
 
 __all__ = (
     'DatabaseInformationBase',
@@ -26,21 +24,17 @@ __all__ = (
     'DatabaseInformationParameterAsync'
 )
 
-
 DatabaseEngineT = TypeVar('DatabaseEngineT', 'rengine.DatabaseEngine', 'rengine.DatabaseEngineAsync')
-
 
 class DatabaseInformationBase(DatabaseBase):
     """
     Database information base type.
     """
 
-
 class DatabaseInformationCatalogSuper(DatabaseInformationBase, Generic[DatabaseEngineT]):
     """
     Database information catalog super type.
     """
-
 
     def __init__(self, engine: DatabaseEngineT) -> None:
         """
@@ -53,7 +47,6 @@ class DatabaseInformationCatalogSuper(DatabaseInformationBase, Generic[DatabaseE
 
         # Parameter.
         self.engine = engine
-
 
     def handle_after_catalog(self, result: Result) -> dict[str, list[str]]:
         """
@@ -82,7 +75,6 @@ class DatabaseInformationCatalogSuper(DatabaseInformationBase, Generic[DatabaseE
             columns.append(column)
 
         return catalog
-
 
     def handle_exist(
         self,
@@ -117,12 +109,10 @@ class DatabaseInformationCatalogSuper(DatabaseInformationBase, Generic[DatabaseE
 
         return judge
 
-
 class DatabaseInformationCatalog(DatabaseInformationCatalogSuper['rengine.DatabaseEngine']):
     """
     Database information catalog type.
     """
-
 
     def catalog(self, filter_system: bool = True) -> dict[str, list[str]]:
         """
@@ -160,9 +150,7 @@ class DatabaseInformationCatalog(DatabaseInformationCatalogSuper['rengine.Databa
 
         return catalog
 
-
     __call__ = catalog
-
 
     def exist(
         self,
@@ -198,12 +186,10 @@ class DatabaseInformationCatalog(DatabaseInformationCatalogSuper['rengine.Databa
 
         return result
 
-
 class DatabaseInformationCatalogAsync(DatabaseInformationCatalogSuper['rengine.DatabaseEngineAsync']):
     """
     Asynchronous database information schema type.
     """
-
 
     async def catalog(self, filter_system: bool = True) -> dict[str, list[str]]:
         """
@@ -241,9 +227,7 @@ class DatabaseInformationCatalogAsync(DatabaseInformationCatalogSuper['rengine.D
 
         return catalog
 
-
     __call__ = catalog
-
 
     async def exist(
         self,
@@ -279,12 +263,10 @@ class DatabaseInformationCatalogAsync(DatabaseInformationCatalogSuper['rengine.D
 
         return result
 
-
 class DatabaseInformationParameterSuper(DatabaseInformationBase, Generic[DatabaseEngineT]):
     """
     Database information parameters super type.
     """
-
 
     def __init__(
         self,
@@ -301,12 +283,10 @@ class DatabaseInformationParameterSuper(DatabaseInformationBase, Generic[Databas
         # Parameter.
         self.engine = engine
 
-
 class DatabaseInformationParameter(DatabaseInformationParameterSuper['rengine.DatabaseEngine']):
     """
     Database information parameters type.
     """
-
 
     def __getitem__(self, key: str) -> str | None:
         """
@@ -326,7 +306,6 @@ class DatabaseInformationParameter(DatabaseInformationParameterSuper['rengine.Da
 
         return value
 
-
     def __setitem__(self, key: str, value: str | float) -> None:
         """
         Set item of parameter dictionary.
@@ -342,7 +321,6 @@ class DatabaseInformationParameter(DatabaseInformationParameterSuper['rengine.Da
 
         # Update.
         self.update(params)
-
 
     @overload
     def get(self) -> dict[str, str]: ...
@@ -381,7 +359,6 @@ class DatabaseInformationParameter(DatabaseInformationParameterSuper['rengine.Da
 
         return param
 
-
     def update(self, params: dict[str, str | float]) -> None:
         """
         Update parameter.
@@ -400,12 +377,10 @@ class DatabaseInformationParameter(DatabaseInformationParameterSuper['rengine.Da
         )
         self.engine.execute(sql, **params)
 
-
 class DatabaseInformationParameterAsync(DatabaseInformationParameterSuper['rengine.DatabaseEngineAsync']):
     """
     Asynchronous database information parameters type.
     """
-
 
     async def __getitem__(self, key: str) -> str | None:
         """
@@ -425,7 +400,6 @@ class DatabaseInformationParameterAsync(DatabaseInformationParameterSuper['rengi
 
         return value
 
-
     async def __setitem__(self, key: str, value: str | float) -> None:
         """
         Asynchronous set item of parameter dictionary.
@@ -441,7 +415,6 @@ class DatabaseInformationParameterAsync(DatabaseInformationParameterSuper['rengi
 
         # Update.
         await self.update(params)
-
 
     @overload
     async def get(self) -> dict[str, str]: ...
@@ -479,7 +452,6 @@ class DatabaseInformationParameterAsync(DatabaseInformationParameterSuper['rengi
             param = result.scalar()
 
         return param
-
 
     async def update(self, params: dict[str, str | float]) -> None:
         """
