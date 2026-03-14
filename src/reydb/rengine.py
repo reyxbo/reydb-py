@@ -8,7 +8,7 @@
 @Explain : Database engine methods.
 """
 
-from typing import TypeVar, Generic
+from typing import TypeVar, Generic, Self
 from urllib.parse import quote as urllib_quote
 from sqlalchemy import Engine, create_engine as sqlalchemy_create_engine
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine as sqlalchemy_create_async_engine
@@ -437,6 +437,14 @@ class DatabaseEngine(
     """
 
     @property
+    def sync_engine(self) -> Self:
+        """
+        Self.
+        """
+
+        return self
+
+    @property
     def async_engine(self) -> 'DatabaseEngineAsync':
         """
         Same engine `DatabaseEngineAsync` instance.
@@ -530,6 +538,14 @@ class DatabaseEngineAsync(
         )
 
         return db
+
+    @property
+    def async_engine(self) -> Self:
+        """
+        Self.
+        """
+
+        return self
 
     async def warm(self, num: int | None = None) -> None:
         """

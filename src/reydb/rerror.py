@@ -191,7 +191,7 @@ class DatabaseError(DatabaseErrorSuper['rengine.DatabaseEngine']):
         tables, views_stats = self.handle_build_db()
 
         # Build.
-        self.engine.build.build(tables=tables, views_stats=views_stats, skip=True)
+        self.engine.build(tables=tables, views_stats=views_stats, skip=True)
 
     def record(
         self,
@@ -358,7 +358,7 @@ class DatabaseErrorAsync(DatabaseErrorSuper['rengine.DatabaseEngineAsync']):
         tables, views_stats = self.handle_build_db()
 
         # Build.
-        await self.engine.build.build(tables=tables, views_stats=views_stats, skip=True)
+        await self.engine.build(tables=tables, views_stats=views_stats, skip=True)
 
     async def record(
         self,

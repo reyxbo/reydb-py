@@ -69,6 +69,10 @@ class DatabaseExecuteSuper(DatabaseBase, Generic[DatabaseConnectionT]):
         ----------
         sql : SQL in method `sqlalchemy.text` format, or `TextClause` object.
         data : Data set for filling.
+            - `Value is Literal['']`: Change into `NULL` type.
+            - `Value is tuple`: Change into `ARRAY` type.
+            - `Value is list | dict`: Change into `JSON` type.
+            - `Value is Enum`: Change into enum value.
         echo : Whether report SQL execute information.
             - `None`: Use attribute `Database.echo`.
             - `bool`: Use this value.
@@ -237,6 +241,10 @@ class DatabaseExecuteSuper(DatabaseBase, Generic[DatabaseConnectionT]):
         ----------
         table : Table name.
         data : Insert data.
+            - `Value is Literal['']`: Change into `NULL` type.
+            - `Value is tuple`: Change into `ARRAY` type.
+            - `Value is list | dict`: Change into `JSON` type.
+            - `Value is Enum`: Change into enum value.
         conflict : Handle constraint conflict field names.
         conflict_do : Handle constraint conflict method.
             - `Literal['nothing']: Ignore conflict.
@@ -385,7 +393,10 @@ class DatabaseExecuteSuper(DatabaseBase, Generic[DatabaseConnectionT]):
         table : Table name.
         data : Update data, join as `key = :value`.
             - `Key`: Table field, each row of fields must be the same, the first field is `WHERE` content.
-            - `Value`: Table value.
+            - `Value is Literal['']`: Change into `NULL` type.
+            - `Value is tuple`: Change into `ARRAY` type.
+            - `Value is list | dict`: Change into `JSON` type.
+            - `Value is Enum`: Change into enum value.
         kwdata : Keyword parameters for filling.
             - `str and first character is ':'`: Use this syntax.
             - `Any`: Use this value.
@@ -615,6 +626,10 @@ class DatabaseExecute(DatabaseExecuteSuper['rconn.DatabaseConnection']):
         ----------
         sql : SQL in method `sqlalchemy.text` format, or `TextClause` object.
         data : Data set for filling.
+            - `Value is Literal['']`: Change into `NULL` type.
+            - `Value is tuple`: Change into `ARRAY` type.
+            - `Value is list | dict`: Change into `JSON` type.
+            - `Value is Enum`: Change into enum value.
         echo : Whether report SQL execute information.
             - `None`: Use attribute `Database.echo`.
             - `bool`: Use this value.
@@ -739,6 +754,10 @@ class DatabaseExecute(DatabaseExecuteSuper['rconn.DatabaseConnection']):
         ----------
         table : Table name.
         data : Insert data.
+            - `Value is Literal['']`: Change into `NULL` type.
+            - `Value is tuple`: Change into `ARRAY` type.
+            - `Value is list | dict`: Change into `JSON` type.
+            - `Value is Enum`: Change into enum value.
         conflict : Handle constraint conflict field names.
         conflict_do : Handle constraint conflict method.
             - `Literal['nothing']: Ignore conflict.
@@ -790,7 +809,10 @@ class DatabaseExecute(DatabaseExecuteSuper['rconn.DatabaseConnection']):
         table : Table name.
         data : Update data, join as `key = :value`.
             - `Key`: Table field, each row of fields must be the same, the first field is `WHERE` content.
-            - `Value`: Table value.
+            - `Value is Literal['']`: Change into `NULL` type.
+            - `Value is tuple`: Change into `ARRAY` type.
+            - `Value is list | dict`: Change into `JSON` type.
+            - `Value is Enum`: Change into enum value.
         echo : Whether report SQL execute information.
             - `None`: Use attribute `Database.echo`.
         kwdata : Keyword parameters for filling.
@@ -1003,6 +1025,10 @@ class DatabaseExecute(DatabaseExecuteSuper['rconn.DatabaseConnection']):
         ----------
         sql : SQL in method `sqlalchemy.text` format, or `TextClause` object.
         data : Data set for filling.
+            - `Value is Literal['']`: Change into `NULL` type.
+            - `Value is tuple`: Change into `ARRAY` type.
+            - `Value is list | dict`: Change into `JSON` type.
+            - `Value is Enum`: Change into enum value.
         echo : Whether report SQL execute information.
             - `None`: Use attribute `Database.echo`.
             - `bool`: Use this value.
@@ -1103,6 +1129,10 @@ class DatabaseExecuteAsync(DatabaseExecuteSuper['rconn.DatabaseConnectionAsync']
         ----------
         sql : SQL in method `sqlalchemy.text` format, or `TextClause` object.
         data : Data set for filling.
+            - `Value is Literal['']`: Change into `NULL` type.
+            - `Value is tuple`: Change into `ARRAY` type.
+            - `Value is list | dict`: Change into `JSON` type.
+            - `Value is Enum`: Change into enum value.
         echo : Whether report SQL execute information.
             - `None`: Use attribute `Database.echo`.
         kwdata : Keyword parameters for filling.
@@ -1241,6 +1271,10 @@ class DatabaseExecuteAsync(DatabaseExecuteSuper['rconn.DatabaseConnectionAsync']
         ----------
         table : Table name.
         data : Insert data.
+            - `Value is Literal['']`: Change into `NULL` type.
+            - `Value is tuple`: Change into `ARRAY` type.
+            - `Value is list | dict`: Change into `JSON` type.
+            - `Value is Enum`: Change into enum value.
         conflict : Handle constraint conflict field names.
         conflict_do : Handle constraint conflict method.
             - `Literal['nothing']: Ignore conflict.
@@ -1292,7 +1326,10 @@ class DatabaseExecuteAsync(DatabaseExecuteSuper['rconn.DatabaseConnectionAsync']
         table : Table name.
         data : Update data, join as `key = :value`.
             - `Key`: Table field, each row of fields must be the same, the first field is `WHERE` content.
-            - `Value`: Table value.
+            - `Value is Literal['']`: Change into `NULL` type.
+            - `Value is tuple`: Change into `ARRAY` type.
+            - `Value is list | dict`: Change into `JSON` type.
+            - `Value is Enum`: Change into enum value.
         echo : Whether report SQL execute information.
             - `None`: Use attribute `Database.echo`.
         kwdata : Keyword parameters for filling.
@@ -1505,6 +1542,10 @@ class DatabaseExecuteAsync(DatabaseExecuteSuper['rconn.DatabaseConnectionAsync']
         ----------
         sql : SQL in method `sqlalchemy.text` format, or `TextClause` object.
         data : Data set for filling.
+            - `Value is Literal['']`: Change into `NULL` type.
+            - `Value is tuple`: Change into `ARRAY` type.
+            - `Value is list | dict`: Change into `JSON` type.
+            - `Value is Enum`: Change into enum value.
         echo : Whether report SQL execute information.
             - `None`: Use attribute `Database.echo`.
         kwdata : Keyword parameters for filling.

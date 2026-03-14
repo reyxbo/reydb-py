@@ -150,7 +150,7 @@ class DatabaseConfig(DatabaseConfigSuper['rengine.DatabaseEngine']):
         tables, views_stats = self.handle_build_db()
 
         # Build.
-        self.engine.build.build(tables=tables, views_stats=views_stats, skip=True)
+        self.engine.build(tables=tables, views_stats=views_stats, skip=True)
 
     def data(self) -> ConfigTable:
         """
@@ -456,7 +456,7 @@ class DatabaseConfigAsync(DatabaseConfigSuper['rengine.DatabaseEngineAsync']):
         tables, views_stats = self.handle_build_db()
 
         # Build.
-        await self.engine.build.build(tables=tables, views_stats=views_stats, skip=True)
+        await self.engine.build(tables=tables, views_stats=views_stats, skip=True)
 
     async def data(self) -> ConfigTable:
         """
