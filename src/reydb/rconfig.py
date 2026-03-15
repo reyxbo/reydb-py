@@ -43,11 +43,11 @@ class DatabaseORMTableConfig(rorm.Table):
     __name__ = 'config'
     __comment__ = 'Config data table.'
     create_time: rorm.Datetime = rorm.Field(field_default=':time', not_null=True, index_n=True, comment='Config create time.')
-    update_time: rorm.Datetime = rorm.Field(field_default=':time', arg_default=now, index_n=True, comment='Config update time.')
+    update_time: rorm.Datetime | None = rorm.Field(field_default=':time', arg_default=now, index_n=True, comment='Config update time.')
     key: str = rorm.Field(rorm.types.VARCHAR(50), key=True, comment='Config key.')
     value: str = rorm.Field(rorm.types.TEXT, not_null=True, comment='Config value.')
     type: str = rorm.Field(rorm.types.VARCHAR(50), not_null=True, comment='Config value type.')
-    note: str = rorm.Field(rorm.types.VARCHAR(500), comment='Config note.')
+    note: str | None = rorm.Field(rorm.types.VARCHAR(500), comment='Config note.')
 
 class DatabaseConfigSuper(DatabaseBase, Generic[DatabaseEngineT]):
     """
