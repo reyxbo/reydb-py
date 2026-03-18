@@ -577,10 +577,13 @@ class DatabaseEngineAsync(
         conns = await async_gather(*coroutines)
 
         ## Close.
-        coroutines = [
-            conn.close()
-            for conn in conns
-        ]
+        if len(coroutines) == 1:
+            coroutines = [conns.close()]
+        else:
+            coroutines = [
+                conn.close()
+                for conn in conns
+            ]
         await async_gather(*coroutines)
 
     async def dispose(self) -> None:
