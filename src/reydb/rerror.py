@@ -30,7 +30,7 @@ DatabaseEngineT = TypeVar('DatabaseEngineT', 'rengine.DatabaseEngine', 'rengine.
 
 class DatabaseORMTableError(rorm.Table):
     """
-    Database "error" table ORM model.
+    Database `error` table ORM model.
     """
 
     __name__ = 'error'
