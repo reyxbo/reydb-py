@@ -212,6 +212,7 @@ class DatabaseORMModelField(DatabaseORMBase, FieldInfo):
         name: str | None = None,
         key: bool = False,
         key_auto: bool = False,
+        key_foreign: str | tuple[str, str] | None = None,
         not_null: bool = False,
         index_n: bool = False,
         index_u: bool = False,
@@ -252,6 +253,9 @@ class DatabaseORMModelField(DatabaseORMBase, FieldInfo):
             - `None`: Same as attribute name.
         key : Whether the field is primary key. When set multiple field, then is composite Primary Key.
         key_auto : Whether the field is primary key and automatic increment.
+        key_foreign : Foreign key constraint.
+            - `str`: Point to the primary key, string format is `table.field`.
+            - `tuple[str, str]`: Point to the primary key, elements is table name and field name.
         not_null : Whether the field is not null constraint.
             - `Litreal[False]`: When argument `arg_default` is `Null`, then set argument `arg_default` is `None`.
         index_n : Whether the field add normal index.
@@ -283,6 +287,7 @@ class DatabaseORMModelField(DatabaseORMBase, FieldInfo):
         ## Convert argument name.
         mapping_keys = {
             'key': 'primary_key',
+            'key_foreign': 'foreign_key',
             'index_n': 'index',
             'index_u': 'unique',
             're': 'pattern',
@@ -333,6 +338,14 @@ class DatabaseORMModelField(DatabaseORMBase, FieldInfo):
         ## Key.
         if kwargs.get('primary_key'):
             kwargs['nullable'] = False
+
+        ## Foreign key.
+        foreign_key = kwargs.get('foreign_key')
+        if (
+            foreign_key
+            and type(foreign_key) == tuple
+        ):
+            kwargs['foreign_key'] = '.'.join(foreign_key)
 
         ## Non null.
         if 'not_null' in kwargs:
