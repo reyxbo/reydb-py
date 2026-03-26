@@ -12,7 +12,7 @@ from typing import Any, Literal, TypeVar, Generic, overload
 from collections.abc import Iterable, Generator, AsyncGenerator, Container
 from datetime import timedelta as Timedelta
 from sqlalchemy.sql.elements import TextClause
-from reykit.rbase import throw, get_first_notnone
+from reykit.rbase import throw, is_class, get_first_notnone
 from reykit.rdata import FunctionGenerator
 from reykit.rmonkey import monkey_sqlalchemy_result_more_fetch, monkey_sqlalchemy_row_index_field
 from reykit.rrand import randn
@@ -136,7 +136,7 @@ class DatabaseExecuteSuper(DatabaseBase, Generic[DatabaseConnectionT]):
 
         # Parameter.
         if (
-            issubclass(table, rorm.Model)
+            is_class(table) and issubclass(table, rorm.Model)
             or isinstance(table, rorm.Model)
         ):
             table = table.__tablename__
@@ -267,7 +267,7 @@ class DatabaseExecuteSuper(DatabaseBase, Generic[DatabaseConnectionT]):
 
         # Parameter.
         if (
-            issubclass(table, rorm.Model)
+            is_class(table) and issubclass(table, rorm.Model)
             or isinstance(table, rorm.Model)
         ):
             table = table.__tablename__
@@ -418,7 +418,7 @@ class DatabaseExecuteSuper(DatabaseBase, Generic[DatabaseConnectionT]):
 
         # Parameter.
         if (
-            issubclass(table, rorm.Model)
+            is_class(table) and issubclass(table, rorm.Model)
             or isinstance(table, rorm.Model)
         ):
             table = table.__tablename__
@@ -511,7 +511,7 @@ class DatabaseExecuteSuper(DatabaseBase, Generic[DatabaseConnectionT]):
 
         # Parameter.
         if (
-            issubclass(table, rorm.Model)
+            is_class(table) and issubclass(table, rorm.Model)
             or isinstance(table, rorm.Model)
         ):
             table = table.__tablename__
@@ -579,7 +579,7 @@ class DatabaseExecuteSuper(DatabaseBase, Generic[DatabaseConnectionT]):
 
         # Parameter.
         if (
-            issubclass(table, rorm.Model)
+            is_class(table) and issubclass(table, rorm.Model)
             or isinstance(table, rorm.Model)
         ):
             table = table.__tablename__
