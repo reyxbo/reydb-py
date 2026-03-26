@@ -41,13 +41,12 @@ from warnings import filterwarnings
 from reykit.rbase import CallableT, Null, throw, is_instance
 from reykit.rtable import TableData, Table as RTable
 
-from . import rengine
+from . import rengine, rexec
 from .rbase import (
     SessionT,
     SessionTransactionT,
     DatabaseBase
 )
-from .rexec import Result
 
 __all__ = (
     'DatabaseORMBase',
@@ -1502,7 +1501,7 @@ class DatabaseORMStatement(DatabaseORMStatementSuper[DatabaseORMSession]):
     Database ORM statement type.
     """
 
-    def execute(self) -> Result:
+    def execute(self) -> 'rexec.Result':
         """
         Execute statement.
 
@@ -1522,7 +1521,7 @@ class DatabaseORMStatement(DatabaseORMStatementSuper[DatabaseORMSession]):
         self.sess.get_begin()
 
         # Execute.
-        result: Result = self.sess.session.exec(self)
+        result: rexec.Result = self.sess.session.exec(self)
 
         ## Select.)
         if isinstance(self, Select):
@@ -1545,7 +1544,7 @@ class DatabaseORMStatementAsync(DatabaseORMStatementSuper[DatabaseORMSessionAsyn
     Asynchronous dtabase ORM statement type.
     """
 
-    async def execute(self) -> Result:
+    async def execute(self) -> 'rexec.Result':
         """
         Asynchronous execute statement.
 
@@ -1565,7 +1564,7 @@ class DatabaseORMStatementAsync(DatabaseORMStatementSuper[DatabaseORMSessionAsyn
         await self.sess.get_begin()
 
         # Execute.
-        result: Result = await self.sess.session.exec(self)
+        result: rexec.Result = await self.sess.session.exec(self)
 
         ## Select.
         if isinstance(self, Select):
