@@ -694,9 +694,9 @@ class DatabaseORMSessionSuper(
         # Build.
         match self:
             case DatabaseORMSession():
-                insert = DatabaseORMStatementInsert(self, model)
+                insert = DatabaseORMStatementInsert[DatabaseORMModelT](self, model)
             case DatabaseORMSessionAsync():
-                insert = DatabaseORMStatementInsertAsync(self, model)
+                insert = DatabaseORMStatementInsertAsync[DatabaseORMModelT](self, model)
 
         return insert
 
@@ -1099,7 +1099,7 @@ class DatabaseORMSession(
         Parameters
         ----------
         models : ORM model instances.
-        """ 
+        """
 
         # Refresh.
         for model in models:
@@ -1108,7 +1108,19 @@ class DatabaseORMSession(
     @overload
     def select(self, model: type[DatabaseORMModelT] | DatabaseORMModelT) -> 'DatabaseORMStatementSelect[DatabaseORMModelT]': ...
 
+    @overload
+    def insert(self, model: type[DatabaseORMModelT] | DatabaseORMModelT) -> 'DatabaseORMStatementInsert[DatabaseORMModelT]': ...
+
+    @overload
+    def update(self, model: type[DatabaseORMModelT] | DatabaseORMModelT) -> 'DatabaseORMStatementUpdate[DatabaseORMModelT]': ...
+
+    @overload
+    def delete(self, model: type[DatabaseORMModelT] | DatabaseORMModelT) -> 'DatabaseORMStatementDelete[DatabaseORMModelT]': ...
+
     select = DatabaseORMSessionSuper.select
+    insert = DatabaseORMSessionSuper.insert
+    update = DatabaseORMSessionSuper.update
+    delete = DatabaseORMSessionSuper.delete
 
 class DatabaseORMSessionAsync(
     DatabaseORMSessionSuper[
@@ -1466,7 +1478,19 @@ class DatabaseORMSessionAsync(
     @overload
     def select(self, model: type[DatabaseORMModelT] | DatabaseORMModelT) -> 'DatabaseORMStatementSelectAsync[DatabaseORMModelT]': ...
 
+    @overload
+    def insert(self, model: type[DatabaseORMModelT] | DatabaseORMModelT) -> 'DatabaseORMStatementInsertAsync[DatabaseORMModelT]': ...
+
+    @overload
+    def update(self, model: type[DatabaseORMModelT] | DatabaseORMModelT) -> 'DatabaseORMStatementUpdateAsync[DatabaseORMModelT]': ...
+
+    @overload
+    def delete(self, model: type[DatabaseORMModelT] | DatabaseORMModelT) -> 'DatabaseORMStatementDeleteAsync[DatabaseORMModelT]': ...
+
     select = DatabaseORMSessionSuper.select
+    insert = DatabaseORMSessionSuper.insert
+    update = DatabaseORMSessionSuper.update
+    delete = DatabaseORMSessionSuper.delete
 
 class DatabaseORMStatementSuper(DatabaseORMBase, Generic[DatabaseORMSessionT]):
     """
@@ -1497,7 +1521,7 @@ class DatabaseORMStatementSuper(DatabaseORMBase, Generic[DatabaseORMSessionT]):
     @overload
     def with_only_columns(self) -> NoReturn: ...
 
-class DatabaseORMStatement(DatabaseORMStatementSuper[DatabaseORMSession]):
+class DatabaseORMStatement(DatabaseORMStatementSuper[DatabaseORMSession], Generic[DatabaseORMModelT]):
     """
     Database ORM statement type.
     """
@@ -1579,7 +1603,7 @@ class DatabaseORMStatement(DatabaseORMStatementSuper[DatabaseORMSession]):
 
         return result
 
-class DatabaseORMStatementAsync(DatabaseORMStatementSuper[DatabaseORMSessionAsync]):
+class DatabaseORMStatementAsync(DatabaseORMStatementSuper[DatabaseORMSessionAsync], Generic[DatabaseORMModelT]):
     """
     Asynchronous dtabase ORM statement type.
     """
@@ -1720,7 +1744,7 @@ class DatabaseORMStatementSelectSuper(DatabaseORMStatementSuper, Select):
 
         return stmt
 
-class DatabaseORMStatementSelect(DatabaseORMStatement, DatabaseORMStatementSelectSuper, Generic[DatabaseORMModelT]):
+class DatabaseORMStatementSelect(DatabaseORMStatement[DatabaseORMModelT], DatabaseORMStatementSelectSuper, Generic[DatabaseORMModelT]):
     """
     Database ORM `select` statement type.
     """
@@ -1736,7 +1760,7 @@ class DatabaseORMStatementSelect(DatabaseORMStatement, DatabaseORMStatementSelec
     @wrap_disabled(text='cannot be used in "select" statement')
     def execute_return(self): ...
 
-class DatabaseORMStatementSelectAsync(DatabaseORMStatementAsync, DatabaseORMStatementSelectSuper, Generic[DatabaseORMModelT]):
+class DatabaseORMStatementSelectAsync(DatabaseORMStatementAsync[DatabaseORMModelT], DatabaseORMStatementSelectSuper, Generic[DatabaseORMModelT]):
     """
     Asynchronous database ORM `select` statement type.
     """
@@ -1852,7 +1876,7 @@ class DatabaseORMStatementInsertSuper(DatabaseORMStatementSuper, Insert):
 
         return insert
 
-class DatabaseORMStatementInsert(DatabaseORMStatement, DatabaseORMStatementInsertSuper):
+class DatabaseORMStatementInsert(DatabaseORMStatement[DatabaseORMModelT], DatabaseORMStatementInsertSuper, Generic[DatabaseORMModelT]):
     """
     Database ORM `insert` statement type.
     """
@@ -1860,7 +1884,7 @@ class DatabaseORMStatementInsert(DatabaseORMStatement, DatabaseORMStatementInser
     inherit_cache: Final = True
     'Compatible type.'
 
-class DatabaseORMStatementInsertAsync(DatabaseORMStatementAsync, DatabaseORMStatementInsertSuper):
+class DatabaseORMStatementInsertAsync(DatabaseORMStatementAsync[DatabaseORMModelT], DatabaseORMStatementInsertSuper, Generic[DatabaseORMModelT]):
     """
     Asynchronous database ORM `insert` statement type.
     """
@@ -1904,7 +1928,7 @@ class DatabaseORMStatementUpdateSuper(DatabaseORMStatementSuper, Update):
 
         return stmt
 
-class DatabaseORMStatementUpdate(DatabaseORMStatement, DatabaseORMStatementUpdateSuper):
+class DatabaseORMStatementUpdate(DatabaseORMStatement[DatabaseORMModelT], DatabaseORMStatementUpdateSuper, Generic[DatabaseORMModelT]):
     """
     Database ORM `update` statement type.
     """
@@ -1912,7 +1936,7 @@ class DatabaseORMStatementUpdate(DatabaseORMStatement, DatabaseORMStatementUpdat
     inherit_cache: Final = True
     'Compatible type.'
 
-class DatabaseORMStatementUpdateAsync(DatabaseORMStatementAsync, DatabaseORMStatementUpdateSuper):
+class DatabaseORMStatementUpdateAsync(DatabaseORMStatementAsync[DatabaseORMModelT], DatabaseORMStatementUpdateSuper, Generic[DatabaseORMModelT]):
     """
     Asynchronous database ORM `update` statement type.
     """
@@ -1956,7 +1980,7 @@ class DatabaseORMStatementDeleteSuper(DatabaseORMStatementSuper, Delete):
 
         return stmt
 
-class DatabaseORMStatementDelete(DatabaseORMStatement, DatabaseORMStatementDeleteSuper, Generic[DatabaseORMModelT]):
+class DatabaseORMStatementDelete(DatabaseORMStatement[DatabaseORMModelT], DatabaseORMStatementDeleteSuper, Generic[DatabaseORMModelT]):
     """
     Database ORM `delete` statement type.
     """
@@ -1964,41 +1988,7 @@ class DatabaseORMStatementDelete(DatabaseORMStatement, DatabaseORMStatementDelet
     inherit_cache: Final = True
     'Compatible type.'
 
-    def execute_return(self, *clauses: str | _ColumnsClauseArgument[bool]) -> list[DatabaseORMModelT]:
-        """
-        Execute statement and return modify records.
-
-        Parameters
-        ----------
-        clauses : Judgement clauses. When is empty, then return all fields.
-            - `str`: SQL string.
-            - `_ColumnsClauseArgument[bool]`: Clause.
-
-        Returns
-        -------
-        Result.
-        """
-
-        # Parameter.
-        if clauses == ():
-            clauses = (self.table,)
-        else:
-            clauses = [
-                sqlalchemy_text(clause)
-                if type(clause) == str
-                else clause
-                for clause in clauses
-            ]
-
-        # Return.
-        stmt = self.returning(*clauses)
-
-        # Execute.
-        result = self.execute(stmt)
-
-        return result
-
-class DatabaseORMStatementDeleteAsync(DatabaseORMStatementAsync, DatabaseORMStatementDeleteSuper):
+class DatabaseORMStatementDeleteAsync(DatabaseORMStatementAsync[DatabaseORMModelT], DatabaseORMStatementDeleteSuper, Generic[DatabaseORMModelT]):
     """
     Asynchronous database ORM `delete` statement type.
     """
