@@ -23,7 +23,7 @@ from sqlalchemy.orm import SessionTransaction, load_only
 from sqlalchemy.sql import func as sqlalchemy_func
 from sqlalchemy.sql.dml import Update, Delete
 from sqlalchemy.sql.sqltypes import TypeEngine
-from sqlalchemy.sql._typing import _ColumnExpressionArgument
+from sqlalchemy.sql._typing import _ColumnExpressionArgument, _ColumnsClauseArgument
 from sqlalchemy.ext.asyncio import AsyncSessionTransaction
 from sqlalchemy.dialects.postgresql import Insert, JSONB, ENUM
 from sqlalchemy.exc import SAWarning
@@ -40,6 +40,7 @@ from datetime import (
 from warnings import filterwarnings
 from reykit.rbase import CallableT, Null, throw, is_instance
 from reykit.rtable import TableData, Table as RTable
+from reykit.rwrap import wrap_disabled
 
 from . import rengine, rexec
 from .rbase import (
@@ -1501,7 +1502,10 @@ class DatabaseORMStatement(DatabaseORMStatementSuper[DatabaseORMSession]):
     Database ORM statement type.
     """
 
-    def execute(self) -> 'rexec.Result':
+    @overload
+    def execute(self) -> 'rexec.Result': ...
+
+    def execute(self, _stmt = None) -> 'rexec.Result':
         """
         Execute statement.
 
@@ -1521,9 +1525,11 @@ class DatabaseORMStatement(DatabaseORMStatementSuper[DatabaseORMSession]):
         self.sess.get_begin()
 
         # Execute.
-        result: rexec.Result = self.sess.session.exec(self)
+        if _stmt is None:
+            _stmt = self
+        result: rexec.Result = self.sess.session.exec(_stmt)
 
-        ## Select.)
+        ## Select.
         if isinstance(self, Select):
             result: list[DatabaseORMModel] = list(result)
 
@@ -1539,12 +1545,49 @@ class DatabaseORMStatement(DatabaseORMStatementSuper[DatabaseORMSession]):
 
         return result
 
+    def execute_return(self, *clauses: str | _ColumnsClauseArgument[bool]) -> list[DatabaseORMModelT]:
+        """
+        Execute statement and return modify records.
+
+        Parameters
+        ----------
+        clauses : Judgement clauses. When is empty, then return all fields.
+            - `str`: SQL string.
+            - `_ColumnsClauseArgument[bool]`: Clause.
+
+        Returns
+        -------
+        Result.
+        """
+
+        # Parameter.
+        if clauses == ():
+            clauses = (self.table,)
+        else:
+            clauses = [
+                sqlalchemy_text(clause)
+                if type(clause) == str
+                else clause
+                for clause in clauses
+            ]
+
+        # Return.
+        stmt = self.returning(*clauses)
+
+        # Execute.
+        result = self.execute(stmt)
+
+        return result
+
 class DatabaseORMStatementAsync(DatabaseORMStatementSuper[DatabaseORMSessionAsync]):
     """
     Asynchronous dtabase ORM statement type.
     """
 
-    async def execute(self) -> 'rexec.Result':
+    @overload
+    async def execute(self) -> 'rexec.Result': ...
+
+    async def execute(self, _stmt = None) -> 'rexec.Result':
         """
         Asynchronous execute statement.
 
@@ -1564,7 +1607,9 @@ class DatabaseORMStatementAsync(DatabaseORMStatementSuper[DatabaseORMSessionAsyn
         await self.sess.get_begin()
 
         # Execute.
-        result: rexec.Result = await self.sess.session.exec(self)
+        if _stmt is None:
+            _stmt = self
+        result: rexec.Result = await self.sess.session.exec(_stmt)
 
         ## Select.
         if isinstance(self, Select):
@@ -1579,6 +1624,40 @@ class DatabaseORMStatementAsync(DatabaseORMStatementSuper[DatabaseORMSessionAsyn
 
             await self.sess.commit()
             await self.sess.close()
+
+        return result
+
+    async def execute_return(self, *clauses: str | _ColumnsClauseArgument[bool]) -> list[DatabaseORMModelT]:
+        """
+        Asynchronous execute statement and return modify records.
+
+        Parameters
+        ----------
+        clauses : Judgement clauses. When is empty, then return all fields.
+            - `str`: SQL string.
+            - `_ColumnsClauseArgument[bool]`: Clause.
+
+        Returns
+        -------
+        Result.
+        """
+
+        # Parameter.
+        if clauses == ():
+            clauses = (self.table,)
+        else:
+            clauses = [
+                sqlalchemy_text(clause)
+                if type(clause) == str
+                else clause
+                for clause in clauses
+            ]
+
+        # Return.
+        stmt = self.returning(*clauses)
+
+        # Execute.
+        result = await self.execute(stmt)
 
         return result
 
@@ -1654,6 +1733,9 @@ class DatabaseORMStatementSelect(DatabaseORMStatement, DatabaseORMStatementSelec
 
     execute = DatabaseORMStatement.execute
 
+    @wrap_disabled(text='cannot be used in "select" statement')
+    def execute_return(self): ...
+
 class DatabaseORMStatementSelectAsync(DatabaseORMStatementAsync, DatabaseORMStatementSelectSuper, Generic[DatabaseORMModelT]):
     """
     Asynchronous database ORM `select` statement type.
@@ -1666,6 +1748,9 @@ class DatabaseORMStatementSelectAsync(DatabaseORMStatementAsync, DatabaseORMStat
     async def execute(self) -> list[DatabaseORMModelT]: ...
 
     execute = DatabaseORMStatementAsync.execute
+
+    @wrap_disabled(text='cannot be used in "select" statement')
+    async def execute_return(self): ...
 
 class DatabaseORMStatementInsertSuper(DatabaseORMStatementSuper, Insert):
     """
@@ -1871,13 +1956,47 @@ class DatabaseORMStatementDeleteSuper(DatabaseORMStatementSuper, Delete):
 
         return stmt
 
-class DatabaseORMStatementDelete(DatabaseORMStatement, DatabaseORMStatementDeleteSuper):
+class DatabaseORMStatementDelete(DatabaseORMStatement, DatabaseORMStatementDeleteSuper, Generic[DatabaseORMModelT]):
     """
     Database ORM `delete` statement type.
     """
 
     inherit_cache: Final = True
     'Compatible type.'
+
+    def execute_return(self, *clauses: str | _ColumnsClauseArgument[bool]) -> list[DatabaseORMModelT]:
+        """
+        Execute statement and return modify records.
+
+        Parameters
+        ----------
+        clauses : Judgement clauses. When is empty, then return all fields.
+            - `str`: SQL string.
+            - `_ColumnsClauseArgument[bool]`: Clause.
+
+        Returns
+        -------
+        Result.
+        """
+
+        # Parameter.
+        if clauses == ():
+            clauses = (self.table,)
+        else:
+            clauses = [
+                sqlalchemy_text(clause)
+                if type(clause) == str
+                else clause
+                for clause in clauses
+            ]
+
+        # Return.
+        stmt = self.returning(*clauses)
+
+        # Execute.
+        result = self.execute(stmt)
+
+        return result
 
 class DatabaseORMStatementDeleteAsync(DatabaseORMStatementAsync, DatabaseORMStatementDeleteSuper):
     """

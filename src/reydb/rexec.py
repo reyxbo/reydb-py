@@ -379,7 +379,7 @@ class DatabaseExecuteSuper(DatabaseBase, Generic[DatabaseConnectionT]):
                 )
             sqls.append(sql_conflict_do)
 
-        ## Part 'returning` syntax.
+        ## Part 'returning' syntax.
         if returning is not None:
             sql_returning = 'RETURNING ' + ', '.join(returning)
             sqls.append(sql_returning)
@@ -393,6 +393,7 @@ class DatabaseExecuteSuper(DatabaseBase, Generic[DatabaseConnectionT]):
         self,
         table: 'str | type[rorm.Model] | rorm.Model',
         data: TableData,
+        returning: str | Iterable[str] | None = None,
         **kwdata: Any
     ) -> tuple[str, dict]:
         """
@@ -407,6 +408,7 @@ class DatabaseExecuteSuper(DatabaseBase, Generic[DatabaseConnectionT]):
             - `Value is tuple`: Change into `ARRAY` type.
             - `Value is list | dict`: Change into `JSON` type.
             - `Value is Enum`: Change into enum value.
+        returning : Return the fields of the inserted record.
         kwdata : Keyword parameters for filling.
             - `str and first character is ':'`: Use this syntax.
             - `Any`: Use this value.
@@ -429,6 +431,11 @@ class DatabaseExecuteSuper(DatabaseBase, Generic[DatabaseConnectionT]):
                     for part in table.split('.')
                 ]
             )
+        if returning is not None:
+            if type(returning) == str:
+                if returning != '*':
+                    returning = f'"{returning}"'
+                returning = [returning]
 
         ## Data.
         data_table = Table(data)
@@ -482,6 +489,11 @@ class DatabaseExecuteSuper(DatabaseBase, Generic[DatabaseConnectionT]):
         sql_where = f'WHERE "{where_filed}" = :{where_filed}'
         sql_list.append(sql_where)
 
+        ## Part 'returning' syntax.
+        if returning is not None:
+            sql_returning = 'RETURNING ' + ', '.join(returning)
+            sql_list.append(sql_returning)
+
         ## Join sql part.
         sql = '\n'.join(sql_list)
 
@@ -492,7 +504,8 @@ class DatabaseExecuteSuper(DatabaseBase, Generic[DatabaseConnectionT]):
         table: 'str | type[rorm.Model] | rorm.Model',
         where: str | None = None,
         order: str | None = None,
-        limit: int | str | None = None
+        limit: int | str | None = None,
+        returning: str | Iterable[str] | None = None
     ) -> str:
         """
         Execute delete SQL.
@@ -503,6 +516,7 @@ class DatabaseExecuteSuper(DatabaseBase, Generic[DatabaseConnectionT]):
         where : Clause `WHERE` content, join as `WHERE str`.
         order : Clause `ORDER BY` content, join as `ORDER BY str`.
         limit : Clause `LIMIT` content, join as `LIMIT int/str`.
+        returning : Return the fields of the inserted record.
 
         Returns
         -------
@@ -522,6 +536,11 @@ class DatabaseExecuteSuper(DatabaseBase, Generic[DatabaseConnectionT]):
                     for part in table.split('.')
                 ]
             )
+        if returning is not None:
+            if type(returning) == str:
+                if returning != '*':
+                    returning = f'"{returning}"'
+                returning = [returning]
 
         # Generate SQL.
         sqls = []
@@ -544,6 +563,11 @@ class DatabaseExecuteSuper(DatabaseBase, Generic[DatabaseConnectionT]):
         if limit is not None:
             sql_limit = f'LIMIT {limit}'
             sqls.append(sql_limit)
+
+        ## Part 'returning' syntax.
+        if returning is not None:
+            sql_returning = 'RETURNING ' + ', '.join(returning)
+            sqls.append(sql_returning)
 
         ## Join sqls.
         sqls = '\n'.join(sqls)
@@ -823,6 +847,7 @@ class DatabaseExecute(DatabaseExecuteSuper['rconn.DatabaseConnection']):
         self,
         table: 'str | type[rorm.Model] | rorm.Model',
         data: TableData,
+        returning: str | Iterable[str] | None = None,
         echo: bool | None = None,
         **kwdata: Any
     ) -> Result:
@@ -838,6 +863,7 @@ class DatabaseExecute(DatabaseExecuteSuper['rconn.DatabaseConnection']):
             - `Value is tuple`: Change into `ARRAY` type.
             - `Value is list | dict`: Change into `JSON` type.
             - `Value is Enum`: Change into enum value.
+        returning : Return the fields of the inserted record.
         echo : Whether report SQL execute information.
             - `None`: Use attribute `Database.echo`.
         kwdata : Keyword parameters for filling.
@@ -856,7 +882,7 @@ class DatabaseExecute(DatabaseExecuteSuper['rconn.DatabaseConnection']):
         """
 
         # Parameter.
-        sql, data = self.handle_update(table, data, **kwdata)
+        sql, data = self.handle_update(table, data, returning, **kwdata)
 
         # Execute SQL.
         result = self.execute(sql, data, echo)
@@ -869,6 +895,7 @@ class DatabaseExecute(DatabaseExecuteSuper['rconn.DatabaseConnection']):
         where: str | None = None,
         order: str | None = None,
         limit: int | str | None = None,
+        returning: str | Iterable[str] | None = None,
         echo: bool | None = None,
         **kwdata: Any
     ) -> Result:
@@ -881,6 +908,7 @@ class DatabaseExecute(DatabaseExecuteSuper['rconn.DatabaseConnection']):
         where : Clause `WHERE` content, join as `WHERE str`.
         order : Clause `ORDER BY` content, join as `ORDER BY str`.
         limit : Clause `LIMIT` content, join as `LIMIT int/str`.
+        returning : Return the fields of the inserted record.
         echo : Whether report SQL execute information.
             - `None`: Use attribute `Database.echo`.
         kwdata : Keyword parameters for filling.
@@ -899,7 +927,7 @@ class DatabaseExecute(DatabaseExecuteSuper['rconn.DatabaseConnection']):
         """
 
         # Parameter.
-        sql = self.handle_delete(table, where, order, limit)
+        sql = self.handle_delete(table, where, order, limit, returning)
 
         # Execute SQL.
         result = self.execute(sql, echo=echo, **kwdata)
@@ -1340,6 +1368,7 @@ class DatabaseExecuteAsync(DatabaseExecuteSuper['rconn.DatabaseConnectionAsync']
         self,
         table: 'str | type[rorm.Model] | rorm.Model',
         data: TableData,
+        returning: str | Iterable[str] | None = None,
         echo: bool | None = None,
         **kwdata: Any
     ) -> Result:
@@ -1355,6 +1384,7 @@ class DatabaseExecuteAsync(DatabaseExecuteSuper['rconn.DatabaseConnectionAsync']
             - `Value is tuple`: Change into `ARRAY` type.
             - `Value is list | dict`: Change into `JSON` type.
             - `Value is Enum`: Change into enum value.
+        returning : Return the fields of the inserted record.
         echo : Whether report SQL execute information.
             - `None`: Use attribute `Database.echo`.
         kwdata : Keyword parameters for filling.
@@ -1373,7 +1403,7 @@ class DatabaseExecuteAsync(DatabaseExecuteSuper['rconn.DatabaseConnectionAsync']
         """
 
         # Parameter.
-        sql, data = self.handle_update(table, data, **kwdata)
+        sql, data = self.handle_update(table, data, returning, **kwdata)
 
         # Execute SQL.
         result = await self.execute(sql, data, echo)
@@ -1386,6 +1416,7 @@ class DatabaseExecuteAsync(DatabaseExecuteSuper['rconn.DatabaseConnectionAsync']
         where: str | None = None,
         order: str | None = None,
         limit: int | str | None = None,
+        returning: str | Iterable[str] | None = None,
         echo: bool | None = None,
         **kwdata: Any
     ) -> Result:
@@ -1398,6 +1429,7 @@ class DatabaseExecuteAsync(DatabaseExecuteSuper['rconn.DatabaseConnectionAsync']
         where : Clause `WHERE` content, join as `WHERE str`.
         order : Clause `ORDER BY` content, join as `ORDER BY str`.
         limit : Clause `LIMIT` content, join as `LIMIT int/str`.
+        returning : Return the fields of the inserted record.
         echo : Whether report SQL execute information.
             - `None`: Use attribute `Database.echo`.
         kwdata : Keyword parameters for filling.
@@ -1416,7 +1448,7 @@ class DatabaseExecuteAsync(DatabaseExecuteSuper['rconn.DatabaseConnectionAsync']
         """
 
         # Parameter.
-        sql = self.handle_delete(table, where, order, limit)
+        sql = self.handle_delete(table, where, order, limit, returning)
 
         # Execute SQL.
         result = await self.execute(sql, echo=echo, **kwdata)
