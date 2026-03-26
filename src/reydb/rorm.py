@@ -1569,37 +1569,21 @@ class DatabaseORMStatement(DatabaseORMStatementSuper[DatabaseORMSession], Generi
 
         return result
 
-    def execute_return(self, *clauses: str | _ColumnsClauseArgument[bool]) -> list[DatabaseORMModelT]:
+    def execute_return(self) -> list[DatabaseORMModelT]:
         """
         Execute statement and return modify records.
-
-        Parameters
-        ----------
-        clauses : Judgement clauses. When is empty, then return all fields.
-            - `str`: SQL string.
-            - `_ColumnsClauseArgument[bool]`: Clause.
 
         Returns
         -------
         Result.
         """
 
-        # Parameter.
-        if clauses == ():
-            clauses = (self.table,)
-        else:
-            clauses = [
-                sqlalchemy_text(clause)
-                if type(clause) == str
-                else clause
-                for clause in clauses
-            ]
-
         # Return.
-        stmt = self.returning(*clauses)
+        stmt = self.returning(self.table)
 
         # Execute.
         result = self.execute(stmt)
+        result = list(result)
 
         return result
 
@@ -1651,37 +1635,24 @@ class DatabaseORMStatementAsync(DatabaseORMStatementSuper[DatabaseORMSessionAsyn
 
         return result
 
-    async def execute_return(self, *clauses: str | _ColumnsClauseArgument[bool]) -> list[DatabaseORMModelT]:
+    async def execute_return(self) -> list[DatabaseORMModelT]:
         """
         Asynchronous execute statement and return modify records.
-
-        Parameters
-        ----------
-        clauses : Judgement clauses. When is empty, then return all fields.
-            - `str`: SQL string.
-            - `_ColumnsClauseArgument[bool]`: Clause.
 
         Returns
         -------
         Result.
         """
 
-        # Parameter.
-        if clauses == ():
-            clauses = (self.table,)
-        else:
-            clauses = [
-                sqlalchemy_text(clause)
-                if type(clause) == str
-                else clause
-                for clause in clauses
-            ]
-
         # Return.
-        stmt = self.returning(*clauses)
+        stmt = self.returning(self.table)
 
         # Execute.
         result = await self.execute(stmt)
+        result = [
+            row[0]
+            for row in result
+        ]
 
         return result
 
