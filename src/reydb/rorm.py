@@ -694,9 +694,9 @@ class DatabaseORMSessionSuper(
         # Build.
         match self:
             case DatabaseORMSession():
-                insert = DatabaseORMStatementInsert[DatabaseORMModelT](self, model)
+                insert = DatabaseORMStatementInsert(self, model)
             case DatabaseORMSessionAsync():
-                insert = DatabaseORMStatementInsertAsync[DatabaseORMModelT](self, model)
+                insert = DatabaseORMStatementInsertAsync(self, model)
 
         return insert
 
