@@ -101,7 +101,7 @@ class DatabaseExecuteSuper(DatabaseBase, Generic[DatabaseConnectionT]):
 
     def handle_select(
         self,
-        table: str | 'type[rorm.Model]' | 'rorm.Model',
+        table: 'str | type[rorm.Model] | rorm.Model',
         fields: str | Iterable[str] | None = None,
         where: str | None = None,
         group: str | None = None,
@@ -212,7 +212,7 @@ class DatabaseExecuteSuper(DatabaseBase, Generic[DatabaseConnectionT]):
     @overload
     def handle_insert(
         self,
-        table: str | 'type[rorm.Model]' | 'rorm.Model',
+        table: 'str | type[rorm.Model] | rorm.Model',
         data: TableData,
         *,
         returning: str | Iterable[str] | None = None,
@@ -222,7 +222,7 @@ class DatabaseExecuteSuper(DatabaseBase, Generic[DatabaseConnectionT]):
     @overload
     def handle_insert(
         self,
-        table: str | 'type[rorm.Model]' | 'rorm.Model',
+        table: 'str | type[rorm.Model] | rorm.Model',
         data: TableData,
         conflict: str | Iterable[str] | None = None,
         conflict_do: Literal['nothing', 'update'] | str | Iterable[str] = 'nothing',
@@ -232,7 +232,7 @@ class DatabaseExecuteSuper(DatabaseBase, Generic[DatabaseConnectionT]):
 
     def handle_insert(
         self,
-        table: str | 'type[rorm.Model]' | 'rorm.Model',
+        table: 'str | type[rorm.Model] | rorm.Model',
         data: TableData,
         conflict: str | Iterable[str] | None = None,
         conflict_do: Literal['nothing', 'update'] | str | Iterable[str] = 'nothing',
@@ -391,7 +391,7 @@ class DatabaseExecuteSuper(DatabaseBase, Generic[DatabaseConnectionT]):
 
     def handle_update(
         self,
-        table: str | 'type[rorm.Model]' | 'rorm.Model',
+        table: 'str | type[rorm.Model] | rorm.Model',
         data: TableData,
         **kwdata: Any
     ) -> tuple[str, dict]:
@@ -489,7 +489,7 @@ class DatabaseExecuteSuper(DatabaseBase, Generic[DatabaseConnectionT]):
 
     def handle_delete(
         self,
-        table: str | 'type[rorm.Model]' | 'rorm.Model',
+        table: 'str | type[rorm.Model] | rorm.Model',
         where: str | None = None,
         order: str | None = None,
         limit: int | str | None = None
@@ -552,7 +552,7 @@ class DatabaseExecuteSuper(DatabaseBase, Generic[DatabaseConnectionT]):
 
     def handle_copy(
         self,
-        table: str | 'type[rorm.Model]' | 'rorm.Model',
+        table: 'str | type[rorm.Model] | rorm.Model',
         fields: str | Iterable[str] | None = None,
         where: str | None = None,
         limit: int | str | tuple[int, int] | None = None
@@ -702,7 +702,7 @@ class DatabaseExecute(DatabaseExecuteSuper['rconn.DatabaseConnection']):
 
     def select(
         self,
-        table: str | 'type[rorm.Model]' | 'rorm.Model',
+        table: 'str | type[rorm.Model] | rorm.Model',
         fields: str | Iterable[str] | None = None,
         where: str | None = None,
         group: str | None = None,
@@ -764,7 +764,7 @@ class DatabaseExecute(DatabaseExecuteSuper['rconn.DatabaseConnection']):
 
     def insert(
         self,
-        table: str | 'type[rorm.Model]' | 'rorm.Model',
+        table: 'str | type[rorm.Model] | rorm.Model',
         data: TableData,
         conflict: str | Iterable[str] | None = None,
         conflict_do: Literal['nothing', 'update'] | str | Iterable[str] = 'nothing',
@@ -821,7 +821,7 @@ class DatabaseExecute(DatabaseExecuteSuper['rconn.DatabaseConnection']):
 
     def update(
         self,
-        table: str | 'type[rorm.Model]' | 'rorm.Model',
+        table: 'str | type[rorm.Model] | rorm.Model',
         data: TableData,
         echo: bool | None = None,
         **kwdata: Any
@@ -865,7 +865,7 @@ class DatabaseExecute(DatabaseExecuteSuper['rconn.DatabaseConnection']):
 
     def delete(
         self,
-        table: str | 'type[rorm.Model]' | 'rorm.Model',
+        table: 'str | type[rorm.Model] | rorm.Model',
         where: str | None = None,
         order: str | None = None,
         limit: int | str | None = None,
@@ -908,7 +908,7 @@ class DatabaseExecute(DatabaseExecuteSuper['rconn.DatabaseConnection']):
 
     def copy(
         self,
-        table: str | 'type[rorm.Model]' | 'rorm.Model',
+        table: 'str | type[rorm.Model] | rorm.Model',
         fields: str | Iterable[str] | None = None,
         where: str | None = None,
         limit: int | str | tuple[int, int] | None = None,
@@ -956,7 +956,7 @@ class DatabaseExecute(DatabaseExecuteSuper['rconn.DatabaseConnection']):
 
     def count(
         self,
-        table: str | 'type[rorm.Model]' | 'rorm.Model',
+        table: 'str | type[rorm.Model] | rorm.Model',
         where: str | None = None,
         echo: bool | None = None,
         **kwdata: Any
@@ -995,7 +995,7 @@ class DatabaseExecute(DatabaseExecuteSuper['rconn.DatabaseConnection']):
 
     def exist(
         self,
-        table: str | 'type[rorm.Model]' | 'rorm.Model',
+        table: 'str | type[rorm.Model] | rorm.Model',
         where: str | None = None,
         echo: bool | None = None,
         **kwdata: Any
@@ -1219,7 +1219,7 @@ class DatabaseExecuteAsync(DatabaseExecuteSuper['rconn.DatabaseConnectionAsync']
 
     async def select(
         self,
-        table: str | 'type[rorm.Model]' | 'rorm.Model',
+        table: 'str | type[rorm.Model] | rorm.Model',
         fields: str | Iterable[str] | None = None,
         where: str | None = None,
         group: str | None = None,
@@ -1281,7 +1281,7 @@ class DatabaseExecuteAsync(DatabaseExecuteSuper['rconn.DatabaseConnectionAsync']
 
     async def insert(
         self,
-        table: str | 'type[rorm.Model]' | 'rorm.Model',
+        table: 'str | type[rorm.Model] | rorm.Model',
         data: TableData,
         conflict: str | Iterable[str] | None = None,
         conflict_do: Literal['nothing', 'update'] | str | Iterable[str] = 'nothing',
@@ -1338,7 +1338,7 @@ class DatabaseExecuteAsync(DatabaseExecuteSuper['rconn.DatabaseConnectionAsync']
 
     async def update(
         self,
-        table: str | 'type[rorm.Model]' | 'rorm.Model',
+        table: 'str | type[rorm.Model] | rorm.Model',
         data: TableData,
         echo: bool | None = None,
         **kwdata: Any
@@ -1382,7 +1382,7 @@ class DatabaseExecuteAsync(DatabaseExecuteSuper['rconn.DatabaseConnectionAsync']
 
     async def delete(
         self,
-        table: str | 'type[rorm.Model]' | 'rorm.Model',
+        table: 'str | type[rorm.Model] | rorm.Model',
         where: str | None = None,
         order: str | None = None,
         limit: int | str | None = None,
@@ -1425,7 +1425,7 @@ class DatabaseExecuteAsync(DatabaseExecuteSuper['rconn.DatabaseConnectionAsync']
 
     async def copy(
         self,
-        table: str | 'type[rorm.Model]' | 'rorm.Model',
+        table: 'str | type[rorm.Model] | rorm.Model',
         fields: str | Iterable[str] | None = None,
         where: str | None = None,
         limit: int | str | tuple[int, int] | None = None,
@@ -1473,7 +1473,7 @@ class DatabaseExecuteAsync(DatabaseExecuteSuper['rconn.DatabaseConnectionAsync']
 
     async def count(
         self,
-        table: str | 'type[rorm.Model]' | 'rorm.Model',
+        table: 'str | type[rorm.Model] | rorm.Model',
         where: str | None = None,
         echo: bool | None = None,
         **kwdata: Any
@@ -1512,7 +1512,7 @@ class DatabaseExecuteAsync(DatabaseExecuteSuper['rconn.DatabaseConnectionAsync']
 
     async def exist(
         self,
-        table: str | 'type[rorm.Model]' | 'rorm.Model',
+        table: 'str | type[rorm.Model] | rorm.Model',
         where: str | None = None,
         echo: bool | None = None,
         **kwdata: Any
