@@ -23,7 +23,7 @@ from sqlalchemy.orm import SessionTransaction, load_only
 from sqlalchemy.sql import func as sqlalchemy_func
 from sqlalchemy.sql.dml import Update, Delete
 from sqlalchemy.sql.sqltypes import TypeEngine
-from sqlalchemy.sql._typing import _ColumnExpressionArgument, _ColumnsClauseArgument
+from sqlalchemy.sql._typing import _ColumnExpressionArgument
 from sqlalchemy.ext.asyncio import AsyncSessionTransaction
 from sqlalchemy.dialects.postgresql import Insert, JSONB, ENUM
 from sqlalchemy.exc import SAWarning
@@ -1849,11 +1849,11 @@ class DatabaseORMStatementInsertSuper(DatabaseORMStatementSuper, Insert):
 
         # Set.
         set_ = {
-            field: self.excluded[field.name]
-            for field in row
+            column.name: self.excluded[column.name]
+            for column in row
             if (
                 fields is None
-                or field in fields
+                or column.name in fields
             )
         }
         insert = self.on_conflict_do_update(index_elements=conflict, set_=set_)
