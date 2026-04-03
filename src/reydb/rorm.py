@@ -12,12 +12,24 @@ from typing import Self, Any, Type, Literal, TypeVar, Generic, Final, NoReturn, 
 from collections.abc import Callable, Iterable
 from functools import wraps as functools_wraps
 from inspect import iscoroutinefunction as inspect_iscoroutinefunction
+from warnings import filterwarnings
+from datetime import (
+    datetime as Datetime,
+    date as Date,
+    time as Time,
+    timedelta as Timedelta
+)
 from pydantic import (
+    BaseModel,
     ConfigDict as ModelConfig,
     EmailStr as Email,
     field_validator as pydantic_field_validator,
     model_validator as pydantic_model_validator
 )
+from sqlmodel import SQLModel, Session, Table as STable
+from sqlmodel.main import SQLModelMetaclass, FieldInfo, default_registry
+from sqlmodel.ext.asyncio.session import AsyncSession
+from sqlmodel.sql._expression_select_cls import SelectOfScalar as Select
 from sqlalchemy import types, text as sqlalchemy_text
 from sqlalchemy.orm import SessionTransaction, load_only
 from sqlalchemy.sql import func as sqlalchemy_func
@@ -27,17 +39,6 @@ from sqlalchemy.sql._typing import _ColumnExpressionArgument
 from sqlalchemy.ext.asyncio import AsyncSessionTransaction
 from sqlalchemy.dialects.postgresql import Insert, JSONB, ENUM
 from sqlalchemy.exc import SAWarning
-from sqlmodel import SQLModel, Session, Table as STable
-from sqlmodel.main import SQLModelMetaclass, FieldInfo, default_registry
-from sqlmodel.ext.asyncio.session import AsyncSession
-from sqlmodel.sql._expression_select_cls import SelectOfScalar as Select
-from datetime import (
-    datetime as Datetime,
-    date as Date,
-    time as Time,
-    timedelta as Timedelta
-)
-from warnings import filterwarnings
 from reykit.rbase import CallableT, Null, throw, is_instance
 from reykit.rtable import TableData, Table as RTable
 from reykit.rwrap import wrap_disabled
@@ -386,19 +387,10 @@ class DatabaseORMModelField(DatabaseORMBase, FieldInfo):
         # Super.
         super().__init__(**kwargs)
 
-model_metaclass: SQLModelMetaclass = DatabaseORMModelMeta
-
-class DatabaseORMModel(DatabaseORMBase, SQLModel, metaclass=model_metaclass):
+class DatabaseORMModel(DatabaseORMBase, BaseModel):
     """
-    Database ORM model type.
+    Database ORM base model type.
     Based on `sqlalchemy` and `sqlmodel` package.
-
-    Examples
-    --------
-    >>> class Foo(DatabaseORMModel, table=True):
-    ...     __name__ = 'Table name, default is class name.'
-    ...     __comment__ = 'Table comment.'
-    ...     ...
     """
 
     @classmethod
@@ -451,7 +443,9 @@ class DatabaseORMModel(DatabaseORMBase, SQLModel, metaclass=model_metaclass):
 
         return method
 
-class DatabaseORMModelTable(DatabaseORMModel):
+model_metaclass: SQLModelMetaclass = DatabaseORMModelMeta
+
+class DatabaseORMModelTable(DatabaseORMModel, SQLModel, metaclass=model_metaclass):
     """
     Database ORM table model type.
     Based on `sqlalchemy` and `sqlmodel` package.
@@ -464,7 +458,7 @@ class DatabaseORMModelTable(DatabaseORMModel):
     ...     ...
     """
 
-class DatabaseORMModelView(DatabaseORMModel):
+class DatabaseORMModelView(DatabaseORMModel, SQLModel, metaclass=model_metaclass):
     """
     Database ORM view model type.
     Based on `sqlalchemy` and `sqlmodel` package.
