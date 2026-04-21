@@ -394,7 +394,7 @@ class DatabaseORMModel(DatabaseORMBase, BaseModel):
     """
 
     @classmethod
-    def _get_table(cls_or_self) -> STable:
+    def r_get_table(cls_or_self) -> STable:
         """
         Return mapping database table instance.
 
@@ -409,27 +409,72 @@ class DatabaseORMModel(DatabaseORMBase, BaseModel):
         return table
 
     @classmethod
-    def _set_name(cls_or_self, name: str) -> None:
+    def r_set_name(cls_or_self, name: str) -> None:
         """
         Set database table name.
         """
 
         # Get.
-        table = cls_or_self._get_table()
+        table = cls_or_self.r_get_table()
         table.name = name
 
     @classmethod
-    def _set_comment(cls_or_self, comment: str) -> None:
+    def r_set_comment(cls_or_self, comment: str) -> None:
         """
         Set database table comment.
         """
 
         # Get.
-        table = cls_or_self._get_table()
+        table = cls_or_self.r_get_table()
         table.comment = comment
 
+    @overload
+    @classmethod
+    def r_validate(
+        cls: 'type[DatabaseORMModelTable] | type[DatabaseORMModelView]',
+        data: dict[str, Any] | SQLModel,
+        update: dict[str, Any] | None = None
+    ) -> Self: ...
+
+    @overload
+    @classmethod
+    def r_validate(
+        cls: 'type[DatabaseORMModel]',
+        data: dict[str, Any] | SQLModel
+    ) -> Self: ...
+
+    @classmethod
+    def r_validate(
+        cls,
+        data: dict[str, Any] | SQLModel,
+        update: dict[str, Any] | None = None
+    ) -> Self:
+        """
+        Validate all attributes, and copy self instance to new instance.
+
+        Parameters
+        ----------
+        data: Base data.
+        update : Update data.
+
+        Returns
+        -------
+        New instance.
+        """
+
+        # Parameter.
+        from_attributes = type(data) != dict
+
+        # Validate.
+        if issubclass(cls, (DatabaseORMModelTable, DatabaseORMModelView)):
+            model = cls.model_validate(data, update=update, from_attributes=from_attributes)
+        else:
+            model = cls.model_validate(data, from_attributes=from_attributes)
+
+        return model
+
     @property
-    def _m(self):
+    def r_m(self):
         """
         Build database ORM model method instance.
 
@@ -493,7 +538,7 @@ class DatabaseORMModelMethod(DatabaseORMBase):
     Database ORM model method type.
     """
 
-    def __init__(self, model: DatabaseORMModel) -> None:
+    def __init__(self, model: DatabaseORMModel | DatabaseORMModelTable | DatabaseORMModelView) -> None:
         """
         Build instance attributes.
 
@@ -532,13 +577,47 @@ class DatabaseORMModelMethod(DatabaseORMBase):
         # Update.
         self.model.sqlmodel_update(data)
 
-    def validate(self) -> Self:
+    @overload
+    def validate(
+        self: DatabaseORMModelTable | DatabaseORMModelView,
+        data: dict[str, Any] | SQLModel | None = None,
+        update: dict[str, Any] | None = None
+    ) -> Self: ...
+
+    @overload
+    def validate(
+        self: DatabaseORMModel,
+        data: dict[str, Any] | SQLModel | None = None
+    ) -> Self: ...
+
+    def validate(
+        self,
+        data: dict[str, Any] | SQLModel | None = None,
+        update: dict[str, Any] | None = None
+    ) -> Self:
         """
         Validate all attributes, and copy self instance to new instance.
+
+        Parameters
+        ----------
+        data: Base data.
+        update : Update data.
+
+        Returns
+        -------
+        New instance.
         """
 
+        # Parameter.
+        if data is None:
+            data = self.model
+        from_attributes = type(data) != dict
+
         # Validate.
-        model = self.model.model_validate(self.model)
+        if isinstance(self.model, (DatabaseORMModelTable, DatabaseORMModelView)):
+            model = self.model.model_validate(data, update=update, from_attributes=from_attributes)
+        else:
+            model = self.model.model_validate(data, from_attributes=from_attributes)
 
         return model
 
@@ -930,7 +1009,7 @@ class DatabaseORMSession(
 
         # Parameter.
         tables = [
-            model._get_table()
+            model.r_get_table()
             for model in models
         ]
 
@@ -958,7 +1037,7 @@ class DatabaseORMSession(
 
         # Parameter.
         tables = [
-            model._get_table()
+            model.r_get_table()
             for model in models
         ]
 
@@ -1298,7 +1377,7 @@ class DatabaseORMSessionAsync(
 
         # Parameter.
         tables = [
-            model._get_table()
+            model.r_get_table()
             for model in models
         ]
 
@@ -1327,7 +1406,7 @@ class DatabaseORMSessionAsync(
 
         # Parameter.
         tables = [
-            model._get_table()
+            model.r_get_table()
             for model in models
         ]
 

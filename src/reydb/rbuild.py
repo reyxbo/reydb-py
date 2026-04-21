@@ -900,7 +900,7 @@ class DatabaseBuildSuper(DatabaseBase, Generic[DatabaseEngineT]):
         """
 
         # Get.
-        table = model._get_table()
+        table = model.r_get_table()
         text = f'TABLE "{table}"'
         if table.comment:
             text += f" | COMMENT '{table.comment}'"
@@ -1079,7 +1079,7 @@ class DatabaseBuild(DatabaseBuildSuper['rengine.DatabaseEngine']):
 
             ## ORM.
             else:
-                table = params._get_table().name
+                table = params.r_get_table().name
 
                 ## Exist.
                 if (
@@ -1275,7 +1275,7 @@ class DatabaseBuildAsync(DatabaseBuildSuper['rengine.DatabaseEngineAsync']):
 
             ## ORM.
             else:
-                table = params._get_table().name
+                table = params.r_get_table().name
 
                 ## Exist.
                 if (
