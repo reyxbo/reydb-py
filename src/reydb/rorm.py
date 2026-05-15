@@ -1801,6 +1801,90 @@ class DatabaseORMStatementSelectSuper(DatabaseORMStatementSuper, Select):
 
         return stmt
 
+    def order_by(self, *clauses: str | _ColumnExpressionArgument[bool]) -> Self:
+        """
+        Set `ORDER BY` syntax.
+
+        Parameters
+        ----------
+        clauses : Judgement clauses.
+            - `str`: SQL string.
+            - `_ColumnExpressionArgument[bool]`: Clause.
+
+        Returns
+        -------
+        Set self.
+        """
+
+        # Parameter.
+        clauses = [
+            sqlalchemy_text(clause)
+            if type(clause) == str
+            else clause
+            for clause in clauses
+        ]
+
+        # Super.
+        stmt = super().order_by(*clauses)
+
+        return stmt
+
+    def group_by(self, *clauses: str | _ColumnExpressionArgument[bool]) -> Self:
+        """
+        Set `GROUP BY` syntax.
+
+        Parameters
+        ----------
+        clauses : Judgement clauses.
+            - `str`: SQL string.
+            - `_ColumnExpressionArgument[bool]`: Clause.
+
+        Returns
+        -------
+        Set self.
+        """
+
+        # Parameter.
+        clauses = [
+            sqlalchemy_text(clause)
+            if type(clause) == str
+            else clause
+            for clause in clauses
+        ]
+
+        # Super.
+        stmt = super().group_by(*clauses)
+
+        return stmt
+
+    def having(self, *clauses: str | _ColumnExpressionArgument[bool]) -> Self:
+        """
+        Set `HAVING` syntax.
+
+        Parameters
+        ----------
+        clauses : Judgement clauses.
+            - `str`: SQL string.
+            - `_ColumnExpressionArgument[bool]`: Clause.
+
+        Returns
+        -------
+        Set self.
+        """
+
+        # Parameter.
+        clauses = [
+            sqlalchemy_text(clause)
+            if type(clause) == str
+            else clause
+            for clause in clauses
+        ]
+
+        # Super.
+        stmt = super().having(*clauses)
+
+        return stmt
+
 class DatabaseORMStatementSelect(DatabaseORMStatement[DatabaseORMModelT], DatabaseORMStatementSelectSuper, Generic[DatabaseORMModelT]):
     """
     Database ORM `select` statement type.
