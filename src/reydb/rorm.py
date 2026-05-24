@@ -428,21 +428,6 @@ class DatabaseORMModel(DatabaseORMBase, BaseModel):
         table = cls_or_self.r_get_table()
         table.comment = comment
 
-    @overload
-    @classmethod
-    def r_validate(
-        cls: 'type[DatabaseORMModelTable] | type[DatabaseORMModelView]',
-        data: dict[str, Any] | SQLModel,
-        update: dict[str, Any] | None = None
-    ) -> Self: ...
-
-    @overload
-    @classmethod
-    def r_validate(
-        cls: 'type[DatabaseORMModel]',
-        data: dict[str, Any] | SQLModel
-    ) -> Self: ...
-
     @classmethod
     def r_validate(
         cls,
@@ -463,13 +448,17 @@ class DatabaseORMModel(DatabaseORMBase, BaseModel):
         """
 
         # Parameter.
-        from_attributes = type(data) != dict
+        is_class = type(data) != dict
 
         # Validate.
         if issubclass(cls, (DatabaseORMModelTable, DatabaseORMModelView)):
-            model = cls.model_validate(data, update=update, from_attributes=from_attributes)
-        else:
-            model = cls.model_validate(data, from_attributes=from_attributes)
+            model = cls.model_validate(data, update=update, from_attributes=is_class)
+        elif issubclass(cls, DatabaseORMModel):
+            if is_class:
+                data = data.model_dump()
+            if update is not None:
+                data.update(update)
+            model = cls.model_validate(data)
 
         return model
 
