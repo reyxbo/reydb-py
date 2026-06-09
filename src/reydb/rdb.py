@@ -57,7 +57,7 @@ class DatabaseSuper(DatabaseBase, Generic[DatabaseEngineT]):
 
     def __call__(
         self,
-        name: str | None = None,
+        name: str | Sequence[str] | None = None,
         **kwargs: Any
     ) -> DatabaseEngineT:
         """
