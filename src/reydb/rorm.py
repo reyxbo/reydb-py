@@ -23,6 +23,11 @@ from pydantic import (
     BaseModel,
     ConfigDict as ModelConfig,
     EmailStr as Email,
+    IPvAnyAddress as Ip,
+    AnyUrl as Url,
+    HttpUrl,
+    Json,
+    FileUrl,
     field_validator as pydantic_field_validator,
     model_validator as pydantic_model_validator
 )
@@ -2163,3 +2168,10 @@ Date
 Time
 Timedelta
 Email
+
+### Only verification, no create table (must explicitly set the field type).
+Ip,
+Url,
+HttpUrl,
+FileUrl,
+Json
