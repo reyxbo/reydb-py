@@ -38,8 +38,8 @@ class DatabaseORMTableError(rorm.Table):
     create_time: rorm.Datetime = rorm.Field(field_default=':time', not_null=True, index_n=True, comment='Record create time.')
     id: int = rorm.Field(key_auto=True, comment='ID.')
     type: str = rorm.Field(rorm.types.VARCHAR(50), not_null=True, index_n=True, comment='Error type.')
-    data: str | None = rorm.Field(rorm.JSONB, comment='Error data.')
-    stack: str | None = rorm.Field(rorm.JSONB, comment='Error code traceback stack.')
+    data: rorm.Json | None = rorm.Field(rorm.JSONB, comment='Error data.')
+    stack: rorm.Json | None = rorm.Field(rorm.JSONB, comment='Error code traceback stack.')
     note: str | None = rorm.Field(rorm.types.VARCHAR(500), comment='Error note.')
 
 class DatabaseErrorSuper(DatabaseBase, Generic[DatabaseEngineT]):
