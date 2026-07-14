@@ -71,9 +71,9 @@ class DatabaseConfigSuper(DatabaseBase, Generic[DatabaseEngineT]):
 
         # Build Database.
         if not self._checked:
-            if type(self) == DatabaseConfig:
+            if type(self) is DatabaseConfig:
                 self.build_db()
-            elif type(self) == DatabaseConfigAsync:
+            elif type(self) is DatabaseConfigAsync:
                 engine.sync_engine.config.build_db()
             self._checked = True
 
@@ -266,7 +266,7 @@ class DatabaseConfig(DatabaseConfigSuper['rengine.DatabaseEngine']):
         """
 
         # Parameter.
-        if type(data) == dict:
+        if type(data) is dict:
             data = [data]
         data = data.copy()
         for row in data:
@@ -292,7 +292,7 @@ class DatabaseConfig(DatabaseConfigSuper['rengine.DatabaseEngine']):
         """
 
         # Remove.
-        if type(key) == str:
+        if type(key) is str:
             where = '"key" = :key'
             limit = 1
         else:
@@ -419,7 +419,7 @@ class DatabaseConfig(DatabaseConfigSuper['rengine.DatabaseEngine']):
         """
 
         # Parameter.
-        if type(key_and_note) != str:
+        if type(key_and_note) is not str:
             key, note = key_and_note
         else:
             key = key_and_note
@@ -572,7 +572,7 @@ class DatabaseConfigAsync(DatabaseConfigSuper['rengine.DatabaseEngineAsync']):
         """
 
         # Parameter.
-        if type(data) == dict:
+        if type(data) is dict:
             data = [data]
         data = data.copy()
         for row in data:
@@ -598,7 +598,7 @@ class DatabaseConfigAsync(DatabaseConfigSuper['rengine.DatabaseEngineAsync']):
         """
 
         # Remove.
-        if type(key) == str:
+        if type(key) is str:
             where = '"key" = :key'
             limit = 1
         else:
@@ -725,7 +725,7 @@ class DatabaseConfigAsync(DatabaseConfigSuper['rengine.DatabaseEngineAsync']):
         """
 
         # Parameter.
-        if type(key_and_note) != str:
+        if type(key_and_note) is not str:
             key, note = key_and_note
         else:
             key = key_and_note

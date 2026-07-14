@@ -145,7 +145,7 @@ class DatabaseORMModelMeta(DatabaseORMBase, SQLModelMetaclass):
             attr_name: str
             if attr_name in attrs:
                 field = attrs[attr_name]
-                if type(field) != DatabaseORMModelField:
+                if type(field) is not DatabaseORMModelField:
                     field = attrs[attr_name] = DatabaseORMModelField(field)
             else:
                 field = attrs[attr_name] = DatabaseORMModelField()
@@ -308,7 +308,7 @@ class DatabaseORMModelField(DatabaseORMBase, FieldInfo):
             'num_places_dec': 'decimal_places'
         }
         for key_old, key_new in mapping_keys.items():
-            if type(key_new) != tuple:
+            if type(key_new) is not tuple:
                 key_new = (key_new,)
             if key_old in kwargs:
                 value = kwargs.pop(key_old)
@@ -349,7 +349,7 @@ class DatabaseORMModelField(DatabaseORMBase, FieldInfo):
         foreign_key = kwargs.get('foreign_key')
         if (
             foreign_key
-            and type(foreign_key) == tuple
+            and type(foreign_key) is tuple
         ):
             kwargs['foreign_key'] = '.'.join(foreign_key)
 
@@ -453,7 +453,7 @@ class DatabaseORMModel(DatabaseORMBase, BaseModel):
         """
 
         # Parameter.
-        is_class = type(data) != dict
+        is_class = type(data) is not dict
 
         # Validate.
         if issubclass(cls, (DatabaseORMModelTable, DatabaseORMModelView)):
@@ -605,7 +605,7 @@ class DatabaseORMModelMethod(DatabaseORMBase):
         # Parameter.
         if data is None:
             data = self.model
-        from_attributes = type(data) != dict
+        from_attributes = type(data) is not dict
 
         # Validate.
         if isinstance(self.model, (DatabaseORMModelTable, DatabaseORMModelView)):
@@ -1785,7 +1785,7 @@ class DatabaseORMStatementSelectSuper(DatabaseORMStatementSuper, Select):
         # Parameter.
         clauses = [
             sqlalchemy_text(clause)
-            if type(clause) == str
+            if type(clause) is str
             else clause
             for clause in clauses
         ]
@@ -1813,7 +1813,7 @@ class DatabaseORMStatementSelectSuper(DatabaseORMStatementSuper, Select):
         # Parameter.
         clauses = [
             sqlalchemy_text(clause)
-            if type(clause) == str
+            if type(clause) is str
             else clause
             for clause in clauses
         ]
@@ -1841,7 +1841,7 @@ class DatabaseORMStatementSelectSuper(DatabaseORMStatementSuper, Select):
         # Parameter.
         clauses = [
             sqlalchemy_text(clause)
-            if type(clause) == str
+            if type(clause) is str
             else clause
             for clause in clauses
         ]
@@ -1869,7 +1869,7 @@ class DatabaseORMStatementSelectSuper(DatabaseORMStatementSuper, Select):
         # Parameter.
         clauses = [
             sqlalchemy_text(clause)
-            if type(clause) == str
+            if type(clause) is str
             else clause
             for clause in clauses
         ]
@@ -1959,7 +1959,7 @@ class DatabaseORMStatementInsertSuper(DatabaseORMStatementSuper, Insert):
         """
 
         # Parameter.
-        if type(conflict) == str:
+        if type(conflict) is str:
             conflict = (conflict,)
 
         # Set.
@@ -1991,9 +1991,9 @@ class DatabaseORMStatementInsertSuper(DatabaseORMStatementSuper, Insert):
         """
 
         # Parameter.
-        if type(conflict) == str:
+        if type(conflict) is str:
             conflict = (conflict,)
-        if type(fields) == str:
+        if type(fields) is str:
             fields = (fields,)
         data = self._multi_values[0]
         row = data[0]
@@ -2053,7 +2053,7 @@ class DatabaseORMStatementUpdateSuper(DatabaseORMStatementSuper, Update):
         # Parameter.
         clauses = [
             sqlalchemy_text(clause)
-            if type(clause) == str
+            if type(clause) is str
             else clause
             for clause in clauses
         ]
@@ -2105,7 +2105,7 @@ class DatabaseORMStatementDeleteSuper(DatabaseORMStatementSuper, Delete):
         # Parameter.
         clauses = [
             sqlalchemy_text(clause)
-            if type(clause) == str
+            if type(clause) is str
             else clause
             for clause in clauses
         ]

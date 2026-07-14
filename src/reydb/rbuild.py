@@ -954,7 +954,7 @@ class DatabaseBuildSuper(DatabaseBase, Generic[DatabaseEngineT]):
                 [
                     (
                         '    UNIQUE CONSTRAIN: '
-                        if type(constraint) == UniqueConstraint
+                        if type(constraint) is UniqueConstraint
                         else '    PRIMARY KEY CONSTRAIN: '
                     ) + ', '.join(
                         [
@@ -1057,7 +1057,7 @@ class DatabaseBuild(DatabaseBuildSuper['rengine.DatabaseEngine']):
         for params in tables:
 
             ## Parameter.
-            if type(params) == dict:
+            if type(params) is dict:
                 table: str = params['table']
 
                 ### Exist.
@@ -1253,7 +1253,7 @@ class DatabaseBuildAsync(DatabaseBuildSuper['rengine.DatabaseEngineAsync']):
         for params in tables:
 
             ## Parameter.
-            if type(params) == dict:
+            if type(params) is dict:
                 table: str = params['table']
 
                 ### Exist.

@@ -9,7 +9,7 @@
 
 Modules
 -------
-rall : All methods.
+rall : All import methods.
 rbase : Base methods.
 rbuild : Database build methods.
 rconfig : Database config methods.

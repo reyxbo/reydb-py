@@ -154,7 +154,7 @@ class DatabaseExecuteSuper(DatabaseBase, Generic[DatabaseConnectionT]):
         ## Part 'SELECT' syntax.
         if fields is None:
             fields = '*'
-        elif type(fields) != str:
+        elif type(fields) is not str:
             fields = ', '.join(
                 [
                     field[1:]
@@ -278,10 +278,10 @@ class DatabaseExecuteSuper(DatabaseBase, Generic[DatabaseConnectionT]):
                     for part in table.split('.')
                 ]
             )
-        if type(conflict) == str:
+        if type(conflict) is str:
             conflict = (conflict,)
         if returning is not None:
-            if type(returning) == str:
+            if type(returning) is str:
                 if returning != '*':
                     returning = f'"{returning}"'
                 returning = [returning]
@@ -299,7 +299,7 @@ class DatabaseExecuteSuper(DatabaseBase, Generic[DatabaseConnectionT]):
         kwdata_replace = {}
         for key, value in kwdata.items():
             if (
-                type(value) == str
+                type(value) is str
                 and value.startswith(':')
                 and value != ':'
             ):
@@ -364,7 +364,7 @@ class DatabaseExecuteSuper(DatabaseBase, Generic[DatabaseConnectionT]):
             else:
                 if (
                     conflict_do != 'update'
-                    and type(conflict_do) == str
+                    and type(conflict_do) is str
                 ):
                     conflict_do = (conflict_do,)
                 sql_conflict_do = 'DO UPDATE SET\n    ' + ',\n    '.join(
@@ -432,7 +432,7 @@ class DatabaseExecuteSuper(DatabaseBase, Generic[DatabaseConnectionT]):
                 ]
             )
         if returning is not None:
-            if type(returning) == str:
+            if type(returning) is str:
                 if returning != '*':
                     returning = f'"{returning}"'
                 returning = [returning]
@@ -450,7 +450,7 @@ class DatabaseExecuteSuper(DatabaseBase, Generic[DatabaseConnectionT]):
         kwdata_value = {}
         for key, value in kwdata.items():
             if (
-                type(value) == str
+                type(value) is str
                 and value.startswith(':')
                 and value != ':'
             ):
@@ -537,7 +537,7 @@ class DatabaseExecuteSuper(DatabaseBase, Generic[DatabaseConnectionT]):
                 ]
             )
         if returning is not None:
-            if type(returning) == str:
+            if type(returning) is str:
                 if returning != '*':
                     returning = f'"{returning}"'
                 returning = [returning]
@@ -616,7 +616,7 @@ class DatabaseExecuteSuper(DatabaseBase, Generic[DatabaseConnectionT]):
             )
         if fields is None:
             fields = '*'
-        elif type(fields) != str:
+        elif type(fields) is not str:
             fields = ', '.join(fields)
 
         # Generate SQL.

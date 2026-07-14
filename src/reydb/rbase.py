@@ -70,7 +70,7 @@ def handle_sql_data(sql: str | TextClause, data: list[dict]) -> tuple[TextClause
     """
 
     # Parameter.
-    if type(sql) == TextClause:
+    if type(sql) is TextClause:
         sql = sql.text
 
     ## Extract keys.
@@ -232,7 +232,7 @@ def extract_engine(engine: Engine | Connection) -> dict[
     """
 
     ## Extract Engine object from Connection boject.
-    if type(engine) == Connection:
+    if type(engine) is Connection:
         engine = engine.engine
 
     ## Extract.
@@ -279,7 +279,7 @@ def get_syntax(self, sql: str | TextClause) -> list[str]:
     """
 
     # Parameter.
-    if type(sql) == TextClause:
+    if type(sql) is TextClause:
         sql = sql.text
 
     # Extract.
@@ -305,7 +305,7 @@ def is_multi_sql(self, sql: str | TextClause) -> bool:
     """
 
     # Parameter.
-    if type(sql) == TextClause:
+    if type(sql) is TextClause:
         sql = sql.text
 
     # Judge.

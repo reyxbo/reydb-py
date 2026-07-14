@@ -64,9 +64,9 @@ class DatabaseErrorSuper(DatabaseBase, Generic[DatabaseEngineT]):
 
         # Build Database.
         if not self._checked:
-            if type(self) == DatabaseError:
+            if type(self) is DatabaseError:
                 self.build_db()
-            elif type(self) == DatabaseErrorAsync:
+            elif type(self) is DatabaseErrorAsync:
                 engine.sync_database.error.build_db()
             self._checked = True
 

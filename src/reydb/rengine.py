@@ -112,7 +112,7 @@ class DatabaseEngineSuper(
         # Parameter.
         if max_keep > max_pool:
             throw(ValueError, max_keep, max_pool)
-        if type(port) == str:
+        if type(port) is str:
             port = int(port)
 
         # Build.
@@ -490,8 +490,10 @@ class DatabaseEngine(
         # Warm.
 
         ## Create.
-        func = lambda: self.engine.connect().close()
-        pool = ThreadPool(func, _max_workers=num)
+        pool = ThreadPool(
+            lambda: self.engine.connect().close(),
+            _max_workers=num
+        )
         pool * 5
 
         ## Wait.

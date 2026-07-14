@@ -97,7 +97,7 @@ class DatabaseSuper(DatabaseBase, Generic[DatabaseEngineT]):
         # Add.
         if name is None:
             name = (engine.database,)
-        elif type(name) == str:
+        elif type(name) is str:
             name = (name,)
         for n in name:
             self.__engine_dict[n] = engine
@@ -188,8 +188,10 @@ class Database(DatabaseSuper[DatabaseEngine]):
         # Warm.
 
         ## Create.
-        func = lambda engine: engine.connect().close()
-        pool = ThreadPool(func, _max_workers=num)
+        pool = ThreadPool(
+            lambda engine: engine.connect().close(),
+            _max_workers=num
+        )
         for engine in engines:
             engine_num = num or engine.max_keep
             for _ in range(engine_num):
