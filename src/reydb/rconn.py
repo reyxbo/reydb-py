@@ -7,12 +7,12 @@
 @Explain : Database connection methods.
 """
 
-from typing import Self, TypeVar, Generic
+from typing import Self
 from sqlalchemy import Connection, Transaction
 from sqlalchemy.ext.asyncio import AsyncConnection, AsyncTransaction
 
 from . import rengine, rexec
-from .rbase import ConnectionT, TransactionT, DatabaseBase
+from .rbase import DatabaseBase
 
 __all__ = (
     'DatabaseConnectionSuper',
@@ -20,10 +20,12 @@ __all__ = (
     'DatabaseConnectionAsync'
 )
 
-DatabaseEngineT = TypeVar('DatabaseEngineT', 'rengine.DatabaseEngine', 'rengine.DatabaseEngineAsync')
-DatabaseExecuteT = TypeVar('DatabaseExecuteT', 'rexec.DatabaseExecute', 'rexec.DatabaseExecuteAsync')
-
-class DatabaseConnectionSuper(DatabaseBase, Generic[DatabaseEngineT, DatabaseExecuteT, ConnectionT, TransactionT]):
+class DatabaseConnectionSuper[
+    DatabaseEngineT: ('rengine.DatabaseEngine', 'rengine.DatabaseEngineAsync'),
+    DatabaseExecuteT: ('rexec.DatabaseExecute', 'rexec.DatabaseExecuteAsync'),
+    ConnectionT: (Connection, AsyncConnection),
+    TransactionT: (Transaction, AsyncTransaction)
+](DatabaseBase):
     """
     Database connection super type.
     """

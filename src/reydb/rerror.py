@@ -7,12 +7,12 @@
 @Explain : Database error methods.
 """
 
-from typing import Any, NoReturn, TypeVar, Generic
+from typing import Any, NoReturn
 from collections.abc import Callable
 from inspect import iscoroutinefunction
 from traceback import StackSummary
 from functools import wraps as functools_wraps
-from reykit.rbase import T, Exit, catch_exc
+from reykit.rbase import Exit, catch_exc
 
 from . import rengine
 from . import rorm
@@ -24,8 +24,6 @@ __all__ = (
     'DatabaseError',
     'DatabaseErrorAsync'
 )
-
-DatabaseEngineT = TypeVar('DatabaseEngineT', 'rengine.DatabaseEngine', 'rengine.DatabaseEngineAsync')
 
 class DatabaseORMTableError(rorm.Table):
     """
@@ -41,7 +39,7 @@ class DatabaseORMTableError(rorm.Table):
     stack: rorm.Json | None = rorm.Field(rorm.JSONB, comment='Error code traceback stack.')
     note: str | None = rorm.Field(rorm.types.VARCHAR(500), comment='Error note.')
 
-class DatabaseErrorSuper(DatabaseBase, Generic[DatabaseEngineT]):
+class DatabaseErrorSuper[DatabaseEngineT: ('rengine.DatabaseEngine', 'rengine.DatabaseEngineAsync')](DatabaseBase):
     """
     Database error super type.
     Can create database used "self.build_db" method.
@@ -79,7 +77,6 @@ class DatabaseErrorSuper(DatabaseBase, Generic[DatabaseEngineT]):
         """
 
         # Parameter.
-        database = self.engine.database
 
         ## Table.
         tables = [DatabaseORMTableError]
@@ -246,9 +243,10 @@ class DatabaseError(DatabaseErrorSuper['rengine.DatabaseEngine']):
             self.record(exc, stack, note)
 
         # Throw exception.
-        raise
+        exc.with_traceback(stack)
+        raise exc
 
-    def wrap(
+    def wrap[T](
         self,
         func: Callable[..., T] | None = None,
         note: str | None = None,
@@ -326,7 +324,7 @@ class DatabaseError(DatabaseErrorSuper['rengine.DatabaseEngine']):
                     result = func_(*args, **kwargs)
 
                 # Record.
-                except BaseException:
+                except BaseException: # noqa: BLE001
                     self.record_catch(note, filter_type)
 
                 return result
@@ -413,9 +411,10 @@ class DatabaseErrorAsync(DatabaseErrorSuper['rengine.DatabaseEngineAsync']):
             await self.record(exc, stack, note)
 
         # Throw exception.
-        raise
+        exc.with_traceback(stack)
+        raise exc
 
-    def wrap(
+    def wrap[T](
         self,
         func: Callable[..., T] | None = None,
         *,
@@ -498,7 +497,7 @@ class DatabaseErrorAsync(DatabaseErrorSuper['rengine.DatabaseEngineAsync']):
                         result = func_(*args, **kwargs)
 
                 # Record.
-                except BaseException:
+                except BaseException: # noqa: BLE001
                     await self.record_catch(note, filter_type)
 
                 return result

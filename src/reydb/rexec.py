@@ -7,8 +7,8 @@
 @Explain : Execute methods.
 """
 
-from typing import Any, Literal, TypeVar, Generic, overload
-from collections.abc import Iterable, Generator, AsyncGenerator, Container
+from typing import Any, Literal, overload
+from collections.abc import Iterable, Generator, AsyncGenerator
 from datetime import timedelta as Timedelta
 from sqlalchemy.sql.elements import TextClause
 from reykit.rbase import throw, is_class, get_first_notnone
@@ -35,9 +35,7 @@ _Result = monkey_sqlalchemy_result_more_fetch()
 Result = _Result
 monkey_sqlalchemy_row_index_field()
 
-DatabaseConnectionT = TypeVar('DatabaseConnectionT', 'rconn.DatabaseConnection', 'rconn.DatabaseConnectionAsync')
-
-class DatabaseExecuteSuper(DatabaseBase, Generic[DatabaseConnectionT]):
+class DatabaseExecuteSuper[DatabaseConnectionT: ('rconn.DatabaseConnection', 'rconn.DatabaseConnectionAsync')](DatabaseBase):
     """
     Database execute super type.
     """
@@ -279,11 +277,13 @@ class DatabaseExecuteSuper(DatabaseBase, Generic[DatabaseConnectionT]):
             )
         if type(conflict) is str:
             conflict = (conflict,)
-        if returning is not None:
-            if type(returning) is str:
-                if returning != '*':
-                    returning = f'"{returning}"'
-                returning = [returning]
+        if (
+            returning is not None
+            and type(returning) is str
+        ):
+            if returning != '*':
+                returning = f'"{returning}"'
+            returning = [returning]
 
         ## Data.
         data_table = Table(data)
@@ -351,11 +351,13 @@ class DatabaseExecuteSuper(DatabaseBase, Generic[DatabaseConnectionT]):
 
         ## Part 'conflict' syntax.
         if conflict is not None:
-            sql_conflict = 'ON CONFLICT(%s)' % ', '.join(
-                [
-                    f'"{field}"'
-                    for field in conflict
-                ]
+            sql_conflict = 'ON CONFLICT({})'.format(
+                ', '.join(
+                    [
+                        f'"{field}"'
+                        for field in conflict
+                    ]
+                )
             )
             sqls.append(sql_conflict)
             if conflict_do == 'nothing':
@@ -430,11 +432,13 @@ class DatabaseExecuteSuper(DatabaseBase, Generic[DatabaseConnectionT]):
                     for part in table.split('.')
                 ]
             )
-        if returning is not None:
-            if type(returning) is str:
-                if returning != '*':
-                    returning = f'"{returning}"'
-                returning = [returning]
+        if (
+            returning is not None
+            and type(returning) is str
+        ):
+            if returning != '*':
+                returning = f'"{returning}"'
+            returning = [returning]
 
         ## Data.
         data_table = Table(data)
@@ -535,11 +539,13 @@ class DatabaseExecuteSuper(DatabaseBase, Generic[DatabaseConnectionT]):
                     for part in table.split('.')
                 ]
             )
-        if returning is not None:
-            if type(returning) is str:
-                if returning != '*':
-                    returning = f'"{returning}"'
-                returning = [returning]
+        if (
+            returning is not None
+            and type(returning) is str
+        ):
+            if returning != '*':
+                returning = f'"{returning}"'
+            returning = [returning]
 
         # Generate SQL.
         sqls = []
@@ -1216,11 +1222,7 @@ class DatabaseExecuteAsync(DatabaseExecuteSuper['rconn.DatabaseConnectionAsync']
             start_str = time_to(start_time, True)[:-3]
             spend_str = time_to(spend_time, True)[:-3]
             end_str = time_to(end_time, True)[:-3]
-            report_runtime = 'Start: %s -> Spend: %ss -> End: %s' % (
-                start_str,
-                spend_str,
-                end_str
-            )
+            report_runtime = f'Start: {start_str} -> Spend: {spend_str}s -> End: {end_str}'
             report_info = (
                 f'{report_runtime}\n'
                 f'Row Count: {result.rowcount}'

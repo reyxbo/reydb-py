@@ -7,7 +7,7 @@
 @Explain : Database config methods.
 """
 
-from typing import Any, TypedDict, TypeVar, Generic
+from typing import Any, TypedDict
 from datetime import (
     datetime as Datetime,
     date as Date,
@@ -31,8 +31,6 @@ __all__ = (
 type ConfigValue = bool | str | int | float | list | tuple | dict | set | Datetime | Date | Time | Timedelta | None
 ConfigRow = TypedDict('ConfigRow', {'key': str, 'value': ConfigValue, 'note': str | None})
 type ConfigTable = list[ConfigRow]
-ConfigValueT = TypeVar('T', bound=ConfigValue) # Any.
-DatabaseEngineT = TypeVar('DatabaseEngineT', 'rengine.DatabaseEngine', 'rengine.DatabaseEngineAsync')
 
 class DatabaseORMTableConfig(rorm.Table):
     """
@@ -48,7 +46,7 @@ class DatabaseORMTableConfig(rorm.Table):
     type: str = rorm.Field(rorm.types.VARCHAR(50), not_null=True, comment='Config value type.')
     note: str | None = rorm.Field(rorm.types.VARCHAR(500), comment='Config note.')
 
-class DatabaseConfigSuper(DatabaseBase, Generic[DatabaseEngineT]):
+class DatabaseConfigSuper[DatabaseEngineT: ('rengine.DatabaseEngine', 'rengine.DatabaseEngineAsync')](DatabaseBase):
     """
     Database config super type.
     Can create database used `self.build_db` method.
@@ -86,7 +84,6 @@ class DatabaseConfigSuper(DatabaseBase, Generic[DatabaseEngineT]):
         """
 
         # Parameter.
-        database = self.engine.database
 
         ## Table.
         tables = [DatabaseORMTableConfig]
@@ -180,7 +177,7 @@ class DatabaseConfig(DatabaseConfigSuper['rengine.DatabaseEngine']):
 
         return result
 
-    def get(self, key: str, default: ConfigValueT | None = None) -> ConfigValue | ConfigValueT:
+    def get[ConfigValueT: ConfigValue](self, key: str, default: ConfigValueT | None = None) -> ConfigValue | ConfigValueT:
         """
         Get config value, when not exist, then return default value.
 
@@ -214,7 +211,7 @@ class DatabaseConfig(DatabaseConfigSuper['rengine.DatabaseEngine']):
 
         return value
 
-    def setdefault(
+    def setdefault[ConfigValueT: ConfigValue](
         self,
         key: str,
         default: ConfigValueT | None = None,
@@ -486,7 +483,7 @@ class DatabaseConfigAsync(DatabaseConfigSuper['rengine.DatabaseEngineAsync']):
 
         return result
 
-    async def get(self, key: str, default: ConfigValueT | None = None) -> ConfigValue | ConfigValueT:
+    async def get[ConfigValueT: ConfigValue](self, key: str, default: ConfigValueT | None = None) -> ConfigValue | ConfigValueT:
         """
         Asynchronous get config value, when not exist, then return default value.
 
@@ -520,7 +517,7 @@ class DatabaseConfigAsync(DatabaseConfigSuper['rengine.DatabaseEngineAsync']):
 
         return value
 
-    async def setdefault(
+    async def setdefault[ConfigValueT: ConfigValue](
         self,
         key: str,
         default: ConfigValueT | None = None,

@@ -7,7 +7,7 @@
 @Explain : Database information methods.
 """
 
-from typing import Literal, TypeVar, Generic, Final, overload
+from typing import overload
 
 from . import rengine
 from .rbase import DatabaseBase
@@ -23,14 +23,12 @@ __all__ = (
     'DatabaseInformationParameterAsync'
 )
 
-DatabaseEngineT = TypeVar('DatabaseEngineT', 'rengine.DatabaseEngine', 'rengine.DatabaseEngineAsync')
-
 class DatabaseInformationBase(DatabaseBase):
     """
     Database information base type.
     """
 
-class DatabaseInformationCatalogSuper(DatabaseInformationBase, Generic[DatabaseEngineT]):
+class DatabaseInformationCatalogSuper[DatabaseEngineT: ('rengine.DatabaseEngine', 'rengine.DatabaseEngineAsync')](DatabaseInformationBase):
     """
     Database information catalog super type.
     """
@@ -262,7 +260,7 @@ class DatabaseInformationCatalogAsync(DatabaseInformationCatalogSuper['rengine.D
 
         return result
 
-class DatabaseInformationParameterSuper(DatabaseInformationBase, Generic[DatabaseEngineT]):
+class DatabaseInformationParameterSuper[DatabaseEngineT: ('rengine.DatabaseEngine', 'rengine.DatabaseEngineAsync')](DatabaseInformationBase):
     """
     Database information parameters super type.
     """

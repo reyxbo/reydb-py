@@ -7,10 +7,10 @@
 @Explain : Database build methods.
 """
 
-from typing import TypedDict, NotRequired, Literal, Type, TypeVar, Generic
+from typing import TypedDict, NotRequired, Literal
 from copy import deepcopy
 from sqlalchemy import UniqueConstraint
-from reykit.rbase import throw, is_instance
+from reykit.rbase import throw
 from reykit.rstdout import ask
 
 from . import rengine
@@ -43,9 +43,8 @@ IndexSet = TypedDict(
         'comment': NotRequired[str | None]
     }
 )
-DatabaseEngineT = TypeVar('DatabaseEngineT', 'rengine.DatabaseEngine', 'rengine.DatabaseEngineAsync')
 
-class DatabaseBuildSuper(DatabaseBase, Generic[DatabaseEngineT]):
+class DatabaseBuildSuper[DatabaseEngineT: ('rengine.DatabaseEngine', 'rengine.DatabaseEngineAsync')](DatabaseBase):
     """
     Database build super type.
     """
@@ -379,24 +378,24 @@ class DatabaseBuildSuper(DatabaseBase, Generic[DatabaseEngineT]):
 
         # Generate select SQL.
         item_first = items[0]
-        select_first = 'SELECT 0 AS "index",\n \'%s\' AS "item",\n(\n    %s\n)::TEXT AS "value",\n%s AS "comment"' % (
+        select_first = 'SELECT 0 AS "index",\n \'{}\' AS "item",\n(\n    {}\n)::TEXT AS "value",\n{} AS "comment"'.format(
             item_first['name'],
             item_first['select'].replace('\n', '\n    '),
             (
                 'NULL'
                 if 'comment' not in item_first
-                else "'%s'" % item_first['comment']
+                else f"'{item_first['comment']}'"
             )
         )
         selects = [
-            "SELECT %s, '%s',\n(\n    %s\n)::TEXT,\n%s" % (
+            "SELECT {}, '{}',\n(\n    {}\n)::TEXT,\n{}".format(
                 index,
                 item['name'],
                 item['select'].replace('\n', '\n    '),
                 (
                     'NULL'
                     if 'comment' not in item
-                    else "'%s'" % item['comment']
+                    else f"'{item['comment']}'"
                 )
             )
             for index, item in enumerate(items[1:], 1)
@@ -752,7 +751,7 @@ class DatabaseBuildSuper(DatabaseBase, Generic[DatabaseEngineT]):
         ## Fields.
         if fields is not None:
             sql_fields = [
-                '%s %s' % (
+                '{} {}'.format(
                     (
                         'MODIFY'
                         if 'old_name' not in field

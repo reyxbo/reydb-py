@@ -7,7 +7,7 @@
 @Explain : Database engine methods.
 """
 
-from typing import TypeVar, Generic, Self
+from typing import Self
 from urllib.parse import quote as urllib_quote
 from sqlalchemy import Engine, create_engine as sqlalchemy_create_engine
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine as sqlalchemy_create_async_engine
@@ -23,53 +23,17 @@ __all__ = (
     'DatabaseEngineAsync'
 )
 
-DatabaseConnectionT = TypeVar('DatabaseConnectionT', 'rconn.DatabaseConnection', 'rconn.DatabaseConnectionAsync')
-DatabaseExecuteT = TypeVar('DatabaseExecuteT', 'rexec.DatabaseExecute', 'rexec.DatabaseExecuteAsync')
-DatabaseORMT = TypeVar('DatabaseORMT', 'rorm.DatabaseORM', 'rorm.DatabaseORMAsync')
-DatabaseBuildT = TypeVar('DatabaseBuildT', 'rbuild.DatabaseBuild', 'rbuild.DatabaseBuildAsync')
-DatabaseConfigT = TypeVar('DatabaseConfigT', 'rconfig.DatabaseConfig', 'rconfig.DatabaseConfigAsync')
-DatabaseInformationCatalogT = TypeVar(
-    'DatabaseInformationCatalogT',
-    'rinfo.DatabaseInformationCatalog',
-    'rinfo.DatabaseInformationCatalogAsync'
-)
-DatabaseInformationParameterT = TypeVar(
-    'DatabaseInformationParameterVariablesT',
-    'rinfo.DatabaseInformationParameterVariables',
-    'rinfo.DatabaseInformationParameterVariablesAsync'
-)
-DatabaseInformationParameterStatusT = TypeVar(
-    'DatabaseInformationParameterStatusT',
-    'rinfo.DatabaseInformationParameterStatus',
-    'rinfo.DatabaseInformationParameterStatusAsync'
-)
-DatabaseInformationParameterVariablesGlobalT = TypeVar(
-    'DatabaseInformationParameterVariablesGlobalT',
-    'rinfo.DatabaseInformationParameterVariablesGlobal',
-    'rinfo.DatabaseInformationParameterVariablesGlobalAsync'
-)
-DatabaseInformationParameterStatusGlobalT = TypeVar(
-    'DatabaseInformationParameterStatusGlobalT',
-    'rinfo.DatabaseInformationParameterStatusGlobal',
-    'rinfo.DatabaseInformationParameterStatusGlobalAsync'
-)
-
-class DatabaseEngineSuper(
-    rbase.DatabaseBase,
-    Generic[
-        rbase.EngineT,
-        DatabaseConnectionT,
-        DatabaseExecuteT,
-        DatabaseORMT,
-        DatabaseBuildT,
-        DatabaseConfigT,
-        DatabaseInformationCatalogT,
-        DatabaseInformationParameterT,
-        DatabaseInformationParameterStatusT,
-        DatabaseInformationParameterVariablesGlobalT,
-        DatabaseInformationParameterStatusGlobalT
-    ]
-):
+class DatabaseEngineSuper[
+    DatabaseEngineT: (Engine, AsyncEngine),
+    DatabaseConnectionT: ('rconn.DatabaseConnection', 'rconn.DatabaseConnectionAsync'),
+    DatabaseExecuteT: ('rexec.DatabaseExecute', 'rexec.DatabaseExecuteAsync'),
+    DatabaseORMT: ('rorm.DatabaseORM', 'rorm.DatabaseORMAsync'),
+    DatabaseBuildT: ('rbuild.DatabaseBuild', 'rbuild.DatabaseBuildAsync'),
+    DatabaseConfigT: ('rconfig.DatabaseConfig', 'rconfig.DatabaseConfigAsync'),
+    DatabaseError: ('rerror.DatabaseError', 'rerror.DatabaseErrorAsync'),
+    DatabaseInformationCatalogT: ('rinfo.DatabaseInformationCatalog', 'rinfo.DatabaseInformationCatalogAsync'),
+    DatabaseInformationParameterT: ('rinfo.DatabaseInformationParameter', 'rinfo.DatabaseInformationParameterAsync'),
+](rbase.DatabaseBase):
     """
     Database engine super type, based `PostgreSQL`.
     """
@@ -341,7 +305,7 @@ class DatabaseEngineSuper(
         return build
 
     @property
-    def error(self):
+    def error(self) -> DatabaseError:
         """
         Build database error instance.
 
@@ -425,10 +389,7 @@ class DatabaseEngine(
         'rbuild.DatabaseBuild',
         'rconfig.DatabaseConfig',
         'rinfo.DatabaseInformationCatalog',
-        'rinfo.DatabaseInformationParameterVariables',
-        'rinfo.DatabaseInformationParameterStatus',
-        'rinfo.DatabaseInformationParameterVariablesGlobal',
-        'rinfo.DatabaseInformationParameterStatusGlobal'
+        'rinfo.DatabaseInformationParameter',
     ]
 ):
     """
@@ -507,10 +468,7 @@ class DatabaseEngineAsync(
         'rbuild.DatabaseBuildAsync',
         'rconfig.DatabaseConfigAsync',
         'rinfo.DatabaseInformationCatalogAsync',
-        'rinfo.DatabaseInformationParameterVariablesAsync',
-        'rinfo.DatabaseInformationParameterStatusAsync',
-        'rinfo.DatabaseInformationParameterVariablesGlobalAsync',
-        'rinfo.DatabaseInformationParameterStatusGlobalAsync'
+        'rinfo.DatabaseInformationParameterAsync',
     ]
 ):
     """

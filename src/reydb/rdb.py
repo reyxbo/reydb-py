@@ -7,8 +7,8 @@
 @Explain : Database methods.
 """
 
-from typing import Any, TypeVar, Generic, overload
-from collections.abc import Iterable, Sequence
+from typing import Any, overload
+from collections.abc import Iterator, Sequence
 from reykit.rbase import Null, throw
 from reykit.rtask import ThreadPool, async_gather
 
@@ -21,9 +21,7 @@ __all__ = (
     'DatabaseAsync'
 )
 
-DatabaseEngineT = TypeVar('DatabaseEngineT', DatabaseEngine, DatabaseEngineAsync)
-
-class DatabaseSuper(DatabaseBase, Generic[DatabaseEngineT]):
+class DatabaseSuper[DatabaseEngineT: (DatabaseEngine, DatabaseEngineAsync)](DatabaseBase):
     """
     Database super type.
     """
@@ -74,7 +72,7 @@ class DatabaseSuper(DatabaseBase, Generic[DatabaseEngineT]):
 
         return result
 
-    def __iter__(self) -> Iterable[str]:
+    def __iter__(self) -> Iterator[str]:
         """
         Iterable of database engine names.
         """
@@ -179,12 +177,10 @@ class Database(DatabaseSuper[DatabaseEngine]):
         """
 
         # Parameter.
-        engines = set(
-            [
-                self[name]
-                for name in self
-            ]
-        )
+        engines = {
+            self[name]
+            for name in self
+        }
 
         # Warm.
 
@@ -217,12 +213,10 @@ class DatabaseAsync(DatabaseSuper[DatabaseEngineAsync]):
         """
 
         # Parameter.
-        engines = set(
-            [
-                self[name]
-                for name in self
-            ]
-        )
+        engines = {
+            self[name]
+            for name in self
+        }
 
         # Warm.
         coroutines = [
@@ -237,12 +231,10 @@ class DatabaseAsync(DatabaseSuper[DatabaseEngineAsync]):
         """
 
         # Parameter.
-        engines = set(
-            [
-                self[name]
-                for name in self
-            ]
-        )
+        engines = {
+            self[name]
+            for name in self
+        }
 
         # Dispose.
         coroutines = [

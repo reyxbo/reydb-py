@@ -7,11 +7,9 @@
 @Explain : Base methods.
 """
 
-from typing import Any, TypedDict, Literal, TypeVar
+from typing import Any, TypedDict, Literal
 from enum import EnumType
-from sqlalchemy import Engine, Connection, Transaction, text as sqlalchemy_text, bindparam as sqlalchemy_bindparam
-from sqlalchemy.orm import Session, SessionTransaction
-from sqlalchemy.ext.asyncio import AsyncEngine, AsyncConnection, AsyncTransaction, AsyncSession, AsyncSessionTransaction
+from sqlalchemy import Engine, Connection, text as sqlalchemy_text, bindparam as sqlalchemy_bindparam
 from sqlalchemy.engine.url import URL
 from sqlalchemy.sql.elements import TextClause
 from reykit.rbase import Base, throw
@@ -27,12 +25,6 @@ __all__ = (
     'get_syntax',
     'is_multi_sql'
 )
-
-EngineT = TypeVar('EngineT', Engine, AsyncEngine)
-ConnectionT = TypeVar('ConnectionT', Connection, AsyncConnection)
-TransactionT = TypeVar('TransactionT', Transaction, AsyncTransaction)
-SessionT = TypeVar('SessionT', Session, AsyncSession)
-SessionTransactionT = TypeVar('SessionTransactionT', SessionTransaction, AsyncSessionTransaction)
 
 URLParameters = TypedDict(
     'URLParameters',
@@ -308,6 +300,6 @@ def is_multi_sql(self, sql: str | TextClause) -> bool:
         sql = sql.text
 
     # Judge.
-    if ';' in sql.rstrip()[:-1]:
-        return True
-    return False
+    result = ';' in sql.rstrip()[:-1]
+
+    return result

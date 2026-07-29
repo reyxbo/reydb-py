@@ -21,5 +21,5 @@ rorm : Database ORM methods.
 rinfo : Database information methods.
 """
 
-from .rdb import Database, DatabaseAsync
-from .rengine import DatabaseEngine, DatabaseEngineAsync
+from .rdb import Database as Database, DatabaseAsync as DatabaseAsync
+from .rengine import DatabaseEngine as DatabaseEngine, DatabaseEngineAsync as DatabaseEngineAsync
