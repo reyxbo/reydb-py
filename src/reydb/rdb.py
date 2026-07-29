@@ -1,5 +1,4 @@
-# !/usr/bin/env python
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
 
 """
 @Time    : 2025-10-09
@@ -36,73 +35,6 @@ class DatabaseSuper(DatabaseBase, Generic[DatabaseEngineT]):
 
         # Build.
         self.__engine_dict: dict[str, DatabaseEngineT] = {}
-
-    @overload
-    def __call__(
-        self,
-        name: str | Sequence[str] | None = None,
-        *,
-        host: str,
-        port: int | str,
-        username: str,
-        password: str,
-        database: str,
-        max_pool: int = 15,
-        max_keep: int = 5,
-        pool_timeout: float = 30.0,
-        pool_recycle: int | None = 3600,
-        echo: bool = False,
-        **query: str
-    ) -> DatabaseEngineT: ...
-
-    def __call__(
-        self,
-        name: str | Sequence[str] | None = None,
-        **kwargs: Any
-    ) -> DatabaseEngineT:
-        """
-        Build instance attributes.
-
-        Parameters
-        ----------
-        name : Database engine name, useed for index.
-            - `None`: Use database name.
-            - `str` : Use this name.
-            - `Sequence[str]`: Use multiple names.
-        host : Remote server database host.
-        port : Remote server database port.
-        username : Remote server database username.
-        password : Remote server database password.
-        database : Remote server database name.
-        max_pool : Maximum number of connections in the pool.
-        max_keep : Maximum number of connections keeped.
-        pool_timeout : Number of seconds `wait create` connection.
-        pool_recycle : Number of seconds `recycle` connection.
-            - `None | Literal[-1]`: No recycle.
-            - `int`: Use this value.
-        echo : Whether report SQL execute information, not include ORM execute.
-        query : Remote server database parameters.
-        """
-
-        # Parameter.
-        match self:
-            case Database():
-                engine_type = DatabaseEngine
-            case DatabaseAsync():
-                engine_type = DatabaseEngineAsync
-
-        # Create.
-        engine = engine_type(**kwargs)
-
-        # Add.
-        if name is None:
-            name = (engine.database,)
-        elif type(name) is str:
-            name = (name,)
-        for n in name:
-            self.__engine_dict[n] = engine
-
-        return engine
 
     def __getattr__(self, database: str) -> DatabaseEngineT:
         """
@@ -161,6 +93,75 @@ class DatabaseSuper(DatabaseBase, Generic[DatabaseEngineT]):
         text = repr(self.__engine_dict)
 
         return text
+
+    @overload
+    def add_engine(
+        self,
+        name: str | Sequence[str] | None = None,
+        *,
+        host: str,
+        port: int | str,
+        username: str,
+        password: str,
+        database: str,
+        max_pool: int = 15,
+        max_keep: int = 5,
+        pool_timeout: float = 30.0,
+        pool_recycle: int | None = 3600,
+        echo: bool = False,
+        **query: str
+    ) -> DatabaseEngineT: ...
+
+    def add_engine(
+        self,
+        name: str | Sequence[str] | None = None,
+        **kwargs: Any
+    ) -> DatabaseEngineT:
+        """
+        Build instance attributes.
+
+        Parameters
+        ----------
+        name : Database engine name, useed for index.
+            - `None`: Use database name.
+            - `str` : Use this name.
+            - `Sequence[str]`: Use multiple names.
+        host : Remote server database host.
+        port : Remote server database port.
+        username : Remote server database username.
+        password : Remote server database password.
+        database : Remote server database name.
+        max_pool : Maximum number of connections in the pool.
+        max_keep : Maximum number of connections keeped.
+        pool_timeout : Number of seconds `wait create` connection.
+        pool_recycle : Number of seconds `recycle` connection.
+            - `None | Literal[-1]`: No recycle.
+            - `int`: Use this value.
+        echo : Whether report SQL execute information, not include ORM execute.
+        query : Remote server database parameters.
+        """
+
+        # Parameter.
+        match self:
+            case Database():
+                engine_type = DatabaseEngine
+            case DatabaseAsync():
+                engine_type = DatabaseEngineAsync
+
+        # Create.
+        engine = engine_type(**kwargs)
+
+        # Add.
+        if name is None:
+            name = (engine.database,)
+        elif type(name) is str:
+            name = (name,)
+        for n in name:
+            self.__engine_dict[n] = engine
+
+        return engine
+
+    __call__ = add_engine
 
 class Database(DatabaseSuper[DatabaseEngine]):
     """
