@@ -184,7 +184,7 @@ class DatabaseEngineSuper[
 
         return url_
 
-    def __create_engine(self) -> rbase.EngineT:
+    def __create_engine(self) -> DatabaseEngineT:
         """
         Create database `Engine` object.
 
