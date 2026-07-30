@@ -388,6 +388,7 @@ class DatabaseEngine(
         'rorm.DatabaseORM',
         'rbuild.DatabaseBuild',
         'rconfig.DatabaseConfig',
+        'rerror.DatabaseError',
         'rinfo.DatabaseInformationCatalog',
         'rinfo.DatabaseInformationParameter',
     ]
@@ -467,6 +468,7 @@ class DatabaseEngineAsync(
         'rorm.DatabaseORMAsync',
         'rbuild.DatabaseBuildAsync',
         'rconfig.DatabaseConfigAsync',
+        'rerror.DatabaseErrorAsync',
         'rinfo.DatabaseInformationCatalogAsync',
         'rinfo.DatabaseInformationParameterAsync',
     ]
