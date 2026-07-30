@@ -243,8 +243,7 @@ class DatabaseError(DatabaseErrorSuper['rengine.DatabaseEngine']):
             self.record(exc, stack, note)
 
         # Throw exception.
-        exc.with_traceback(stack)
-        raise exc
+        raise # noqa: PLE0704
 
     def wrap[T](
         self,
