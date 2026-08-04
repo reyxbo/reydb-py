@@ -36,6 +36,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlmodel.sql._expression_select_cls import SelectOfScalar as Select
 from sqlalchemy import types, text as sqlalchemy_text
 from sqlalchemy.orm import SessionTransaction, load_only
+from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy.sql import func as sqlalchemy_func
 from sqlalchemy.sql.dml import Update, Delete
 from sqlalchemy.sql.sqltypes import TypeEngine
@@ -204,7 +205,7 @@ class DatabaseORMModelField(DatabaseORMBase, FieldInfo):
         name: str | None = None,
         key: bool = False,
         key_auto: bool = False,
-        key_foreign: str | tuple[str, str] | None = None,
+        key_foreign: str | tuple[str, str] | InstrumentedAttribute | None = None,
         not_null: bool = False,
         index_n: bool = False,
         index_u: bool = False,
@@ -245,9 +246,10 @@ class DatabaseORMModelField(DatabaseORMBase, FieldInfo):
             - `None`: Same as attribute name.
         key : Whether the field is primary key. When set multiple field, then is composite Primary Key.
         key_auto : Whether the field is primary key and automatic increment.
-        key_foreign : Foreign key constraint.
+        key_foreign : Foreign key constraint, the main table must be declared first.
             - `str`: Point to the primary key, string format is `table.field`.
             - `tuple[str, str]`: Point to the primary key, elements is table name and field name.
+            - `InstrumentedAttribute`: Column instance of the main table.
         not_null : Whether the field is not null constraint.
             - `Litreal[False]`: When argument `arg_default` is `Null`, then set argument `arg_default` is `None`.
         index_n : Whether the field add normal index.
@@ -271,7 +273,7 @@ class DatabaseORMModelField(DatabaseORMBase, FieldInfo):
         kwargs = {
             key: value
             for key, value in kwargs.items()
-            if value not in (None, False)
+            if value is not None and value is not False
         }
         kwargs.setdefault('sa_column_kwargs', {})
         kwargs['sa_column_kwargs']['quote'] = True
@@ -338,6 +340,8 @@ class DatabaseORMModelField(DatabaseORMBase, FieldInfo):
             and type(foreign_key) is tuple
         ):
             kwargs['foreign_key'] = '.'.join(foreign_key)
+        elif isinstance(foreign_key, InstrumentedAttribute):
+            kwargs['foreign_key'] = f'{foreign_key.table.name}.{foreign_key.name}'
 
         ## Non null.
         if 'not_null' in kwargs:
