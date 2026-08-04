@@ -34,66 +34,8 @@ class DatabaseSuper[DatabaseEngineT: (DatabaseEngine, DatabaseEngineAsync)](Data
         # Build.
         self.__engine_dict: dict[str, DatabaseEngineT] = {}
 
-    def __getattr__(self, database: str) -> DatabaseEngineT:
-        """
-        Get added database engine.
-
-        Parameters
-        ----------
-        database : Database name.
-        """
-
-        # Get.
-        engine = self.__engine_dict.get(database, Null)
-
-        # Throw exception.
-        if engine == Null:
-            text = f"lack of database engine '{database}'"
-            throw(AssertionError, text=text)
-
-        return engine
-
     @overload
-    def __getitem__(self, database: str) -> DatabaseEngineT: ...
-
-    __getitem__ = __getattr__
-
-    def __contains__(self, name: str) -> bool:
-        """
-        Whether the exist this database engine.
-
-        Parameters
-        ----------
-        name : Database engine name.
-        """
-
-        # Judge.
-        result = name in self.__engine_dict
-
-        return result
-
-    def __iter__(self) -> Iterator[str]:
-        """
-        Iterable of database engine names.
-        """
-
-        # Generate.
-        names = iter(self.__engine_dict)
-
-        return names
-
-    def __repr__(self) -> str:
-        """
-        Text content.
-        """
-
-        # Get.
-        text = repr(self.__engine_dict)
-
-        return text
-
-    @overload
-    def add_engine(
+    def __call__(
         self,
         name: str | Sequence[str] | None = None,
         *,
@@ -110,7 +52,7 @@ class DatabaseSuper[DatabaseEngineT: (DatabaseEngine, DatabaseEngineAsync)](Data
         **query: str
     ) -> DatabaseEngineT: ...
 
-    def add_engine(
+    def __call__(
         self,
         name: str | Sequence[str] | None = None,
         **kwargs: Any
@@ -159,7 +101,60 @@ class DatabaseSuper[DatabaseEngineT: (DatabaseEngine, DatabaseEngineAsync)](Data
 
         return engine
 
-    __call__ = add_engine
+    def __getattr__(self, database: str) -> DatabaseEngineT:
+        """
+        Get added database engine.
+
+        Parameters
+        ----------
+        database : Database name.
+        """
+
+        # Get.
+        engine = self.__engine_dict.get(database, Null)
+
+        # Throw exception.
+        if engine == Null:
+            text = f"lack of database engine '{database}'"
+            throw(AssertionError, text=text)
+
+        return engine
+
+    __getitem__ = __getattr__
+
+    def __contains__(self, name: str) -> bool:
+        """
+        Whether the exist this database engine.
+
+        Parameters
+        ----------
+        name : Database engine name.
+        """
+
+        # Judge.
+        result = name in self.__engine_dict
+
+        return result
+
+    def __iter__(self) -> Iterator[str]:
+        """
+        Iterable of database engine names.
+        """
+
+        # Generate.
+        names = iter(self.__engine_dict)
+
+        return names
+
+    def __repr__(self) -> str:
+        """
+        Text content.
+        """
+
+        # Get.
+        text = repr(self.__engine_dict)
+
+        return text
 
 class Database(DatabaseSuper[DatabaseEngine]):
     """
