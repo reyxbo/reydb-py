@@ -203,6 +203,7 @@ class DatabaseORMModelField(DatabaseORMBase, FieldInfo):
         arg_default: Any | Callable[[], Any] | Null.Type = Null,
         arg_update: Any | Callable[[], Any] = None,
         name: str | None = None,
+        name_out: str | None = None,
         key: bool = False,
         key_auto: bool = False,
         key_foreign: str | tuple[str, str] | InstrumentedAttribute | None = None,
@@ -244,6 +245,7 @@ class DatabaseORMModelField(DatabaseORMBase, FieldInfo):
             - `Callable[[], Any]`: Call function and use return value.
         name : Call argument name and database field name.
             - `None`: Same as attribute name.
+        name_out : Output argument name (e.g. `model_dump` method convert to Dict).
         key : Whether the field is primary key. When set multiple field, then is composite Primary Key.
         key_auto : Whether the field is primary key and automatic increment.
         key_foreign : Foreign key constraint, the main table must be declared first.
@@ -280,6 +282,7 @@ class DatabaseORMModelField(DatabaseORMBase, FieldInfo):
 
         ## Convert argument name.
         mapping_keys = {
+            'name_out': 'serialization_alias',
             'key': 'primary_key',
             'key_foreign': 'foreign_key',
             'index_n': 'index',
