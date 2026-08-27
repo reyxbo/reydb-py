@@ -104,7 +104,8 @@ class DatabaseExecuteSuper[DatabaseConnectionT: ('rconn.DatabaseConnection', 'rc
         group: str | None = None,
         having: str | None = None,
         order: str | None = None,
-        limit: int | str | tuple[int, int] | None = None
+        limit: int | str | None = None,
+        offset: int | str | None = None
     ) -> str:
         """
         Handle method of execute select SQL.
@@ -122,9 +123,8 @@ class DatabaseExecuteSuper[DatabaseConnectionT: ('rconn.DatabaseConnection', 'rc
         group : Clause `GROUP BY` content, join as `GROUP BY str`.
         having : Clause `HAVING` content, join as `HAVING str`.
         order : Clause `ORDER BY` content, join as `ORDER BY str`.
-        limit : Clause `LIMIT` content.
-            - `int | str`: Join as `LIMIT int/str`.
-            - `tuple[int, int]`: Join as `LIMIT int, int`.
+        limit : Clause `LIMIT` content, join as `LIMIT int/str`.
+        offset : Clause `OFFSET` content, join as `OFFSET int/str`.
 
         Returns
         -------
@@ -192,14 +192,13 @@ class DatabaseExecuteSuper[DatabaseConnectionT: ('rconn.DatabaseConnection', 'rc
 
         ## Part 'LIMIT' syntax.
         if limit is not None:
-            if type(limit) in (str, int):
-                sql_limit = f'LIMIT {limit}'
-            else:
-                if len(limit) == 2:
-                    sql_limit = f'LIMIT {limit[0]}, {limit[1]}'
-                else:
-                    throw(ValueError, limit)
+            sql_limit = f'LIMIT {limit}'
             sql_list.append(sql_limit)
+
+        ## Part 'OFFSET' syntax.
+        if offset is not None:
+            sql_offset = f'OFFSET {offset}'
+            sql_list.append(sql_offset)
 
         ## Join sql part.
         sql = '\n'.join(sql_list)
@@ -508,6 +507,7 @@ class DatabaseExecuteSuper[DatabaseConnectionT: ('rconn.DatabaseConnection', 'rc
         where: str | None = None,
         order: str | None = None,
         limit: int | str | None = None,
+        offset: int | str | None = None,
         returning: str | Iterable[str] | None = None
     ) -> str:
         """
@@ -519,6 +519,7 @@ class DatabaseExecuteSuper[DatabaseConnectionT: ('rconn.DatabaseConnection', 'rc
         where : Clause `WHERE` content, join as `WHERE str`.
         order : Clause `ORDER BY` content, join as `ORDER BY str`.
         limit : Clause `LIMIT` content, join as `LIMIT int/str`.
+        offset : Clause `OFFSET` content, join as `OFFSET int/str`.
         returning : Return the fields of the inserted record.
 
         Returns
@@ -569,6 +570,11 @@ class DatabaseExecuteSuper[DatabaseConnectionT: ('rconn.DatabaseConnection', 'rc
             sql_limit = f'LIMIT {limit}'
             sqls.append(sql_limit)
 
+        ## Part 'OFFSET' syntax.
+        if offset is not None:
+            sql_offset = f'OFFSET {offset}'
+            sqls.append(sql_offset)
+
         ## Part 'returning' syntax.
         if returning is not None:
             sql_returning = 'RETURNING ' + ', '.join(returning)
@@ -584,7 +590,8 @@ class DatabaseExecuteSuper[DatabaseConnectionT: ('rconn.DatabaseConnection', 'rc
         table: 'str | type[rorm.Model] | rorm.Model',
         fields: str | Iterable[str] | None = None,
         where: str | None = None,
-        limit: int | str | tuple[int, int] | None = None
+        limit: int | str | None = None,
+        offset: int | str | None = None
     ) -> str:
         """
         Execute inesrt SQL of copy records.
@@ -597,9 +604,8 @@ class DatabaseExecuteSuper[DatabaseConnectionT: ('rconn.DatabaseConnection', 'rc
             - `str`: Join as `SELECT str`.
             - `Iterable[str]`: Join as `SELECT "str", ...`.
         where : Clause `WHERE` content, join as `WHERE str`.
-        limit : Clause `LIMIT` content.
-            - `int | str`: Join as `LIMIT int/str`.
-            - `tuple[int, int]`: Join as `LIMIT int, int`.
+        limit : Clause `LIMIT` content, join as `LIMIT int/str`.
+        offset : Clause `OFFSET` content, join as `OFFSET int/str`.
 
         Returns
         -------
@@ -647,14 +653,13 @@ class DatabaseExecuteSuper[DatabaseConnectionT: ('rconn.DatabaseConnection', 'rc
 
         ## Part 'LIMIT' syntax.
         if limit is not None:
-            if type(limit) in (str, int):
-                sql_limit = f'LIMIT {limit}'
-            else:
-                if len(limit) == 2:
-                    sql_limit = f'LIMIT {limit[0]}, {limit[1]}'
-                else:
-                    throw(ValueError, limit)
+            sql_limit = f'LIMIT {limit}'
             sqls.append(sql_limit)
+
+        ## Part 'OFFSET' syntax.
+        if offset is not None:
+            sql_offset = f'OFFSET {offset}'
+            sqls.append(sql_offset)
 
         ## Join.
         sql = '\n'.join(sqls)
@@ -737,7 +742,8 @@ class DatabaseExecute(DatabaseExecuteSuper['rconn.DatabaseConnection']):
         group: str | None = None,
         having: str | None = None,
         order: str | None = None,
-        limit: int | str | tuple[int, int] | None = None,
+        limit: int | str | None = None,
+        offset: int | str | None = None,
         echo: bool | None = None,
         **kwdata: Any
     ) -> Result:
@@ -757,9 +763,8 @@ class DatabaseExecute(DatabaseExecuteSuper['rconn.DatabaseConnection']):
         group : Clause `GROUP BY` content, join as `GROUP BY str`.
         having : Clause `HAVING` content, join as `HAVING str`.
         order : Clause `ORDER BY` content, join as `ORDER BY str`.
-        limit : Clause `LIMIT` content.
-            - `int | str`: Join as `LIMIT int/str`.
-            - `tuple[int, int]`: Join as `LIMIT int, int`.
+        limit : Clause `LIMIT` content, join as `LIMIT int/str`.
+        offset : Clause `OFFSET` content, join as `OFFSET int/str`.
         echo : Whether report SQL execute information.
             - `None`: Use attribute `Database.echo`.
         kwdata : Keyword parameters for filling.
@@ -784,7 +789,7 @@ class DatabaseExecute(DatabaseExecuteSuper['rconn.DatabaseConnection']):
         """
 
         # Parameter.
-        sql = self.handle_select(table, fields, where, group, having, order, limit)
+        sql = self.handle_select(table, fields, where, group, having, order, limit, offset)
 
         # Execute SQL.
         result = self.execute(sql, echo=echo, **kwdata)
@@ -900,6 +905,7 @@ class DatabaseExecute(DatabaseExecuteSuper['rconn.DatabaseConnection']):
         where: str | None = None,
         order: str | None = None,
         limit: int | str | None = None,
+        offset: int | str | None = None,
         returning: str | Iterable[str] | None = None,
         echo: bool | None = None,
         **kwdata: Any
@@ -913,6 +919,7 @@ class DatabaseExecute(DatabaseExecuteSuper['rconn.DatabaseConnection']):
         where : Clause `WHERE` content, join as `WHERE str`.
         order : Clause `ORDER BY` content, join as `ORDER BY str`.
         limit : Clause `LIMIT` content, join as `LIMIT int/str`.
+        offset : Clause `OFFSET` content, join as `OFFSET int/str`.
         returning : Return the fields of the inserted record.
         echo : Whether report SQL execute information.
             - `None`: Use attribute `Database.echo`.
@@ -932,7 +939,7 @@ class DatabaseExecute(DatabaseExecuteSuper['rconn.DatabaseConnection']):
         """
 
         # Parameter.
-        sql = self.handle_delete(table, where, order, limit, returning)
+        sql = self.handle_delete(table, where, order, limit, offset, returning)
 
         # Execute SQL.
         result = self.execute(sql, echo=echo, **kwdata)
@@ -944,7 +951,8 @@ class DatabaseExecute(DatabaseExecuteSuper['rconn.DatabaseConnection']):
         table: 'str | type[rorm.Model] | rorm.Model',
         fields: str | Iterable[str] | None = None,
         where: str | None = None,
-        limit: int | str | tuple[int, int] | None = None,
+        limit: int | str | None = None,
+        offset: int | str | None = None,
         echo: bool | None = None,
         **kwdata: Any
     ) -> Result:
@@ -959,9 +967,8 @@ class DatabaseExecute(DatabaseExecuteSuper['rconn.DatabaseConnection']):
             - `str`: Join as `SELECT str`.
             - `Iterable[str]`: Join as `SELECT "str", ...`.
         where : Clause `WHERE` content, join as `WHERE str`.
-        limit : Clause `LIMIT` content.
-            - `int | str`: Join as `LIMIT int/str`.
-            - `tuple[int, int]`: Join as `LIMIT int, int`.
+        limit : Clause `LIMIT` content, join as `LIMIT int/str`.
+        offset : Clause `OFFSET` content, join as `OFFSET int/str`.
         echo : Whether report SQL execute information.
             - `None`: Use attribute `Database.echo`.
         kwdata : Keyword parameters for filling.
@@ -980,7 +987,7 @@ class DatabaseExecute(DatabaseExecuteSuper['rconn.DatabaseConnection']):
         """
 
         # Parameter.
-        sql = self.handle_copy(table, fields, where, limit)
+        sql = self.handle_copy(table, fields, where, limit, offset)
 
         # Execute SQL.
         result = self.execute(sql, echo=echo, **kwdata)
@@ -1254,7 +1261,8 @@ class DatabaseExecuteAsync(DatabaseExecuteSuper['rconn.DatabaseConnectionAsync']
         group: str | None = None,
         having: str | None = None,
         order: str | None = None,
-        limit: int | str | tuple[int, int] | None = None,
+        limit: int | str | None = None,
+        offset: int | str | None = None,
         echo: bool | None = None,
         **kwdata: Any
     ) -> Result:
@@ -1274,9 +1282,8 @@ class DatabaseExecuteAsync(DatabaseExecuteSuper['rconn.DatabaseConnectionAsync']
         group : Clause `GROUP BY` content, join as `GROUP BY str`.
         having : Clause `HAVING` content, join as `HAVING str`.
         order : Clause `ORDER BY` content, join as `ORDER BY str`.
-        limit : Clause `LIMIT` content.
-            - `int | str`: Join as `LIMIT int/str`.
-            - `tuple[int, int]`: Join as `LIMIT int, int`.
+        limit : Clause `LIMIT` content, join as `LIMIT int/str`.
+        offset : Clause `OFFSET` content, join as `OFFSET int/str`.
         echo : Whether report SQL execute information.
             - `None`: Use attribute `Database.echo`.
         kwdata : Keyword parameters for filling.
@@ -1301,7 +1308,7 @@ class DatabaseExecuteAsync(DatabaseExecuteSuper['rconn.DatabaseConnectionAsync']
         """
 
         # Parameter.
-        sql = self.handle_select(table, fields, where, group, having, order, limit)
+        sql = self.handle_select(table, fields, where, group, having, order, limit, offset)
 
         # Execute SQL.
         result = await self.execute(sql, echo=echo, **kwdata)
@@ -1417,6 +1424,7 @@ class DatabaseExecuteAsync(DatabaseExecuteSuper['rconn.DatabaseConnectionAsync']
         where: str | None = None,
         order: str | None = None,
         limit: int | str | None = None,
+        offset: int | str | None = None,
         returning: str | Iterable[str] | None = None,
         echo: bool | None = None,
         **kwdata: Any
@@ -1430,6 +1438,7 @@ class DatabaseExecuteAsync(DatabaseExecuteSuper['rconn.DatabaseConnectionAsync']
         where : Clause `WHERE` content, join as `WHERE str`.
         order : Clause `ORDER BY` content, join as `ORDER BY str`.
         limit : Clause `LIMIT` content, join as `LIMIT int/str`.
+        offset : Clause `OFFSET` content, join as `OFFSET int/str`.
         returning : Return the fields of the inserted record.
         echo : Whether report SQL execute information.
             - `None`: Use attribute `Database.echo`.
@@ -1449,7 +1458,7 @@ class DatabaseExecuteAsync(DatabaseExecuteSuper['rconn.DatabaseConnectionAsync']
         """
 
         # Parameter.
-        sql = self.handle_delete(table, where, order, limit, returning)
+        sql = self.handle_delete(table, where, order, limit, offset, returning)
 
         # Execute SQL.
         result = await self.execute(sql, echo=echo, **kwdata)
@@ -1461,7 +1470,8 @@ class DatabaseExecuteAsync(DatabaseExecuteSuper['rconn.DatabaseConnectionAsync']
         table: 'str | type[rorm.Model] | rorm.Model',
         fields: str | Iterable[str] | None = None,
         where: str | None = None,
-        limit: int | str | tuple[int, int] | None = None,
+        limit: int | str | None = None,
+        offset: int | str | None = None,
         echo: bool | None = None,
         **kwdata: Any
     ) -> Result:
@@ -1476,9 +1486,8 @@ class DatabaseExecuteAsync(DatabaseExecuteSuper['rconn.DatabaseConnectionAsync']
             - `str`: Join as `SELECT str`.
             - `Iterable[str]`: Join as `SELECT "str", ...`.
         where : Clause `WHERE` content, join as `WHERE str`.
-        limit : Clause `LIMIT` content.
-            - `int | str`: Join as `LIMIT int/str`.
-            - `tuple[int, int]`: Join as `LIMIT int, int`.
+        limit : Clause `LIMIT` content, join as `LIMIT int/str`.
+        offset : Clause `OFFSET` content, join as `OFFSET int/str`.
         echo : Whether report SQL execute information.
             - `None`: Use attribute `Database.echo`.
         kwdata : Keyword parameters for filling.
@@ -1497,7 +1506,7 @@ class DatabaseExecuteAsync(DatabaseExecuteSuper['rconn.DatabaseConnectionAsync']
         """
 
         # Parameter.
-        sql = self.handle_copy(table, fields, where, limit)
+        sql = self.handle_copy(table, fields, where, limit, offset)
 
         # Execute SQL.
         result = await self.execute(sql, echo=echo, **kwdata)
