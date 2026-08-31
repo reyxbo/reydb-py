@@ -1754,7 +1754,7 @@ class DatabaseORMStatementSelectSuper(DatabaseORMStatementSuper, Select):
 
         # Set.
         attrs = [
-            self.model[name]
+            getattr(self.model, name)
             for name in names
         ]
         set = load_only(*attrs)
