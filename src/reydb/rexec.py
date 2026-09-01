@@ -4,7 +4,8 @@
 @Time    : 2025-09-22
 @Author  : Rey
 @Contact : reyxbo@163.com
-@Explain : Execute methods.
+@Explain : Database execution module.
+    Provides functionality for SQL statement construction, execution, parameter injection, and value injection.
 """
 
 from typing import Any, Literal, overload

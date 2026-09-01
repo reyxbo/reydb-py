@@ -4,7 +4,9 @@
 @Time    : 2022-12-05
 @Author  : Rey
 @Contact : reyxbo@163.com
-@Explain : Database engine methods.
+@Explain : Database engine module.
+    Provides database engine and connection pool objects.
+    It is mainly used to manage database connection resources and provide a unified engine access interface for upper-level database operations.
 """
 
 from typing import Self
@@ -355,11 +357,11 @@ class DatabaseEngineSuper[
         # Build.
         match self:
             case DatabaseEngine():
-                schema = rinfo.DatabaseInformationCatalog(self)
+                catalog = rinfo.DatabaseInformationCatalog(self)
             case DatabaseEngineAsync():
-                schema = rinfo.DatabaseInformationCatalogAsync(self)
+                catalog = rinfo.DatabaseInformationCatalogAsync(self)
 
-        return schema
+        return catalog
 
     @property
     def param(self) -> DatabaseInformationParameterT:

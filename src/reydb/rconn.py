@@ -4,7 +4,8 @@
 @Time    : 2022-12-05
 @Author  : Rey
 @Contact : reyxbo@163.com
-@Explain : Database connection methods.
+@Explain : Database connection module.
+    Provides database connection objects and database event objects.
 """
 
 from typing import Self

@@ -4,7 +4,8 @@
 @Time    : 2025-10-09
 @Author  : Rey
 @Contact : reyxbo@163.com
-@Explain : Database methods.
+@Explain : Top-level database module.
+    Provides a top-level database object for centrally managing multiple database engines and their connection pool objects.
 """
 
 from typing import Any, overload

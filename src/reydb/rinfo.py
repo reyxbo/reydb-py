@@ -4,7 +4,8 @@
 @Time    : 2022-12-05
 @Author  : Rey
 @Contact : reyxbo@163.com
-@Explain : Database information methods.
+@Explain : Database information module.
+    Provides methods for querying and modifying database metadata.
 """
 
 from typing import overload

@@ -4,7 +4,9 @@
 @Time    : 2025-07-18
 @Author  : Rey
 @Contact : reyxbo@163.com
-@Explain : Base methods.
+@Explain : Base methods module.
+    Provides basic dependency methods used by other modules.
+    Supports common functionality shared between reydb modules.
 """
 
 from typing import Any, TypedDict, Literal

@@ -4,7 +4,8 @@
 @Time    : 2025-08-22
 @Author  : Rey
 @Contact : reyxbo@163.com
-@Explain : Database config methods.
+@Explain : Database configuration module.
+    Provides methods for storing and managing database configuration parameters.
 """
 
 from typing import Any, TypedDict

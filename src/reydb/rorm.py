@@ -4,7 +4,8 @@
 @Time    : 2025-09-23
 @Author  : Rey
 @Contact : reyxbo@163.com
-@Explain : Database ORM methods.
+@Explain : Database ORM module.
+    Provides database ORM mapping and related operations.
 """
 
 from typing import Self, Any, Literal, Final, NoReturn, overload

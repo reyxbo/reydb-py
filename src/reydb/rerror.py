@@ -4,7 +4,10 @@
 @Time    : 2025-08-20
 @Author  : Rey
 @Contact : reyxbo@163.com
-@Explain : Database error methods.
+@Explain : Database error module.
+    Provides methods for storing Python exception data in database tables.
+    Target functions can be wrapped using decorators or other mechanisms so that
+    exception-related data is recorded in the database when an exception occurs during function execution.
 """
 
 from typing import Any, NoReturn

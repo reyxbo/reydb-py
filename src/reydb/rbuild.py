@@ -4,7 +4,8 @@
 @Time    : 2023-10-14
 @Author  : Rey
 @Contact : reyxbo@163.com
-@Explain : Database build methods.
+@Explain : Database build module.
+    Provides methods for creating and deleting database table structures.
 """
 
 from typing import TypedDict, NotRequired, Literal
