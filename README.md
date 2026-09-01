@@ -1,3 +1,5 @@
+[中文](README_zh.md)
+
 # reydb
 
 **reydb** is a Python database engine and connection pool package built on **SQLAlchemy**, **SQLModel**, and **Pydantic**.
