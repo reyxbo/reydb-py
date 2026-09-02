@@ -300,7 +300,7 @@ Main dependencies:
 | Database            | `PostgreSQL`                                              |
 | Author              | `Rey`                                                     |
 | Email               | `reyxbo@163.com`                                          |
-| Homepage            | [reyxbo.com](https://www.reyxbo.com/release/python/reydb) |
+| Homepage            | [REYXBO](https://www.reyxbo.com/release/python/reydb)     |
 | Repository          | [reydb-py](https://github.com/reyxbo/reydb-py.git)        |
 
 ## Keywords

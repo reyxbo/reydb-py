@@ -318,7 +318,7 @@ reydb 的数据库支持版本如下：
 | 数据库        | `PostgreSQL`                                              |
 | 作者         | `Rey`                                                     |
 | 邮箱         | `reyxbo@163.com`                                          |
-| Homepage   | [reyxbo.com](https://www.reyxbo.com/release/python/reydb) |
+| Homepage   | [REYXBO](https://www.reyxbo.com/release/python/reydb)     |
 | Repository | [reydb-py](https://github.com/reyxbo/reydb-py.git)        |
 
 ## 关键词
