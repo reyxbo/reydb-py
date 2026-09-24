@@ -8,7 +8,7 @@
     Provides database ORM mapping and related operations.
 """
 
-from typing import Self, Any, Literal, Final, NoReturn, overload
+from typing import Self, Any, Literal, Final, NoReturn, overload, get_args as get_type_args
 from collections.abc import Callable, Iterable
 from functools import wraps as functools_wraps
 from inspect import iscoroutinefunction as inspect_iscoroutinefunction
@@ -137,6 +137,15 @@ class DatabaseORMModelMeta(DatabaseORMBase, SQLModelMetaclass):
                     field = attrs[attr_name] = DatabaseORMModelField(field)
             else:
                 field = attrs[attr_name] = DatabaseORMModelField()
+
+            ### Datetime.
+            annotation = annotations[attr_name]
+            if (
+                annotation is Datetime
+                or Datetime in get_type_args(annotation)
+            ):
+                field.sa_type = types.DateTime(timezone=False)
+
             sa_column_kwargs: dict = field.sa_column_kwargs
             sa_column_kwargs.setdefault('name', attr_name)
 
@@ -1995,14 +2004,14 @@ class DatabaseORMStatementInsertSuper(DatabaseORMStatementSuper, Insert):
         row = data[0]
 
         # Set.
-        set_ = {
-            column.name: self.excluded[column.name]
-            for column in row
-            if (
-                fields is None
-                or column.name in fields
-            )
-        }
+        set_ = {}
+        for column in row:
+            if isinstance(column, str):
+                name = column
+            else:
+                name = column.name
+            if fields is None or name in fields:
+                set_[name] = self.excluded[name]
         insert = self.on_conflict_do_update(index_elements=conflict, set_=set_)
 
         return insert
