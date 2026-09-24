@@ -16,7 +16,6 @@ from datetime import (
     timedelta as Timedelta
 )
 from reykit.rbase import Null, throw
-from reykit.rtime import now
 
 from . import rengine
 from . import rorm
@@ -41,7 +40,7 @@ class DatabaseORMTableConfig(rorm.Table):
     __name__ = 'config'
     __comment__ = 'Config data table.'
     create_time: rorm.Datetime = rorm.Field(field_default=':time', not_null=True, index_n=True, comment='Config create time.')
-    update_time: rorm.Datetime | None = rorm.Field(field_default=':time', arg_default=now, index_n=True, comment='Config update time.')
+    update_time: rorm.Datetime | None = rorm.Field(field_default=':time', index_n=True, comment='Config update time.')
     key: str = rorm.Field(rorm.types.VARCHAR(50), key=True, comment='Config key.')
     value: str = rorm.Field(rorm.types.TEXT, not_null=True, comment='Config value.')
     type: str = rorm.Field(rorm.types.VARCHAR(50), not_null=True, comment='Config value type.')
@@ -122,7 +121,12 @@ class DatabaseConfigSuper[DatabaseEngineT: ('rengine.DatabaseEngine', 'rengine.D
             }
         ]
 
-        return tables, views_stats
+        ## Update time trigger.
+        update_time_triggers = [
+            (DatabaseORMTableConfig.__tablename__, 'update_time')
+        ]
+
+        return tables, views_stats, update_time_triggers
 
 class DatabaseConfig(DatabaseConfigSuper['rengine.DatabaseEngine']):
     """
@@ -144,10 +148,11 @@ class DatabaseConfig(DatabaseConfigSuper['rengine.DatabaseEngine']):
         """
 
         # Parameter.
-        tables, views_stats = self.handle_build_db()
+        tables, views_stats, update_time_triggers = self.handle_build_db()
 
         # Build.
-        self.engine.build(tables=tables, views_stats=views_stats, skip=True)
+        self.engine.build(tables=tables, views_stats=views_stats, update_time_triggers=update_time_triggers, skip=True)
+        self.engine.build.add_update_time_trigger()
 
     def data(self) -> ConfigTable:
         """
@@ -450,10 +455,10 @@ class DatabaseConfigAsync(DatabaseConfigSuper['rengine.DatabaseEngineAsync']):
         """
 
         # Parameter.
-        tables, views_stats = self.handle_build_db()
+        tables, views_stats, update_time_triggers = self.handle_build_db()
 
         # Build.
-        await self.engine.build(tables=tables, views_stats=views_stats, skip=True)
+        await self.engine.build(tables=tables, views_stats=views_stats, update_time_triggers=update_time_triggers, skip=True)
 
     async def data(self) -> ConfigTable:
         """

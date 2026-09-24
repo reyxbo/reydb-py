@@ -1006,12 +1006,80 @@ class DatabaseBuild(DatabaseBuildSuper['rengine.DatabaseEngine']):
         # Drop.
         self.engine.orm.drop(*models, skip=skip)
 
+    def add_update_time_trigger(
+        self,
+        table: str,
+        column: str,
+    ) -> bool:
+        """
+        Add an automatic update time trigger to a table column.
+
+        Parameters
+        ----------
+        table : Table name.
+        column : Column name.
+
+        Returns
+        -------
+        Added as True this time, previously added as False.
+        """
+
+        # Trigger.
+
+        ## Existed.
+        trigger_name = f'{table}_{column}_update_time'
+        sql = (
+            'SELECT EXISTS (\n'
+            '    SELECT 1\n'
+            '    FROM pg_trigger t\n'
+            '    JOIN pg_class c ON c.oid = t.tgrelid\n'
+            '    WHERE c.relname = :table_name\n'
+            '    AND t.tgname = :trigger_name\n'
+            '    AND NOT t.tgisinternal\n'
+            ')'
+        )
+        result = self.engine.execute(
+            sql,
+            table_name=table,
+            trigger_name=trigger_name
+        )
+        exist = result.scalar()
+        if exist:
+            return False
+
+        # Create.
+        sql = (
+            'CREATE OR REPLACE FUNCTION set_update_time()\n'
+            'RETURNS TRIGGER AS $$\n'
+            'BEGIN\n'
+            '    NEW := jsonb_populate_record(\n'
+            '        NEW,\n'
+            '        jsonb_build_object(TG_ARGV[0], CURRENT_TIMESTAMP)\n'
+            '    );\n'
+            '    RETURN NEW;\n'
+            'END;\n'
+            '$$ LANGUAGE plpgsql\n'
+        )
+        self.engine.execute(sql)
+
+        # Add.
+        sql = (
+            f'CREATE TRIGGER "{trigger_name}"\n'
+            f'BEFORE UPDATE ON "{table}"\n'
+            'FOR EACH ROW\n'
+            f'EXECUTE FUNCTION set_update_time(\'{column}\')\n'
+        )
+        self.engine.execute(sql)
+
+        return True
+
     def build(
         self,
         databases: list[dict] | None = None,
         tables: list[dict | type[rorm.Model] | rorm.Model] | None = None,
         views: list[dict] | None = None,
         views_stats: list[dict] | None = None,
+        update_time_triggers: list[tuple[str, str]] | None = None,
         ask: bool = True,
         skip: bool = False
     ) -> None:
@@ -1024,6 +1092,7 @@ class DatabaseBuild(DatabaseBuildSuper['rengine.DatabaseEngine']):
         tables : Tables build parameters or model, equivalent to the parameters of method `self.create_table` or `self.create_orm_table`.
         views : Views build parameters, equivalent to the parameters of method `self.create_view`.
         views_stats : Views stats build parameters, equivalent to the parameters of method `self.create_view_stats`.
+        update_time_triggers : Update time trigger build parameters.
         ask : Whether ask confirm execute.
         skip : Whether skip existing table.
         """
@@ -1033,6 +1102,7 @@ class DatabaseBuild(DatabaseBuildSuper['rengine.DatabaseEngine']):
         tables = tables or []
         views = views or []
         views_stats = views_stats or []
+        update_time_triggers = update_time_triggers or []
         refresh_schema = False
 
         # Database.
@@ -1155,6 +1225,17 @@ class DatabaseBuild(DatabaseBuildSuper['rengine.DatabaseEngine']):
             print(text)
             refresh_schema = True
 
+        # Update time trigger.
+        for params in update_time_triggers:
+
+            ## Execute.
+            result = self.add_update_time_trigger(*params)
+
+            ## Report.
+            if result:
+                text = f"Update time trigger '{f'{params[0]}_{params[1]}_update_time'}' of database '{self.engine.database}' add completed."
+                print(text)
+
         # Refresh schema.
         if refresh_schema:
             self.engine.catalog()
@@ -1200,6 +1281,73 @@ class DatabaseBuildAsync(DatabaseBuildSuper['rengine.DatabaseEngineAsync']):
         # Drop.
         await self.engine.orm.drop(*models, skip=skip)
 
+    async def add_update_time_trigger(
+        self,
+        table: str,
+        column: str,
+    ) -> bool:
+        """
+        Asynchronous add an automatic update time trigger to a table column.
+
+        Parameters
+        ----------
+        table : Table name.
+        column : Column name.
+
+        Returns
+        -------
+        Added as True this time, previously added as False.
+        """
+
+        # Trigger.
+
+        ## Existed.
+        trigger_name = f'{table}_{column}_update_time'
+        sql = (
+            'SELECT EXISTS (\n'
+            '    SELECT 1\n'
+            '    FROM pg_trigger t\n'
+            '    JOIN pg_class c ON c.oid = t.tgrelid\n'
+            '    WHERE c.relname = :table_name\n'
+            '    AND t.tgname = :trigger_name\n'
+            '    AND NOT t.tgisinternal\n'
+            ')'
+        )
+        result = await self.engine.execute(
+            sql,
+            table_name=table,
+            trigger_name=trigger_name
+        )
+        exist = result.scalar()
+        if exist:
+            return False
+
+        # Create.
+        sql = (
+            'CREATE OR REPLACE FUNCTION set_update_time()\n'
+            'RETURNS TRIGGER AS $$\n'
+            'BEGIN\n'
+            '    NEW := jsonb_populate_record(\n'
+            '        NEW,\n'
+            '        jsonb_build_object(TG_ARGV[0], CURRENT_TIMESTAMP)\n'
+            '    );\n'
+            '    RETURN NEW;\n'
+            'END;\n'
+            '$$ LANGUAGE plpgsql\n'
+        )
+        await self.engine.execute(sql)
+
+        # Add.
+        sql = (
+            f'CREATE TRIGGER "{trigger_name}"\n'
+            f'BEFORE UPDATE ON "{table}"\n'
+            'FOR EACH ROW\n'
+            f'EXECUTE FUNCTION set_update_time(\'{column}\')\n'
+        )
+        await self.engine.execute(sql)
+
+        return True
+
     async def build(
         self,
         databases: list[dict] | None = None,
@@ -1207,6 +1355,7 @@ class DatabaseBuildAsync(DatabaseBuildSuper['rengine.DatabaseEngineAsync']):
         tables_orm: list[type[rorm.Model]] | None = None,
         views: list[dict] | None = None,
         views_stats: list[dict] | None = None,
+        update_time_triggers: list[tuple[str, str]] | None = None,
         ask: bool = True,
         skip: bool = False
     ) -> None:
@@ -1215,10 +1364,11 @@ class DatabaseBuildAsync(DatabaseBuildSuper['rengine.DatabaseEngineAsync']):
 
         Parameters
         ----------
-        databases : Database build parameters, equivalent to the parameters of method `self.create_database`.
-        tables : Tables build parameters, equivalent to the parameters of method `self.create_table`.
-        views : Views build parameters, equivalent to the parameters of method `self.create_view`.
-        views_stats : Views stats build parameters, equivalent to the parameters of method `self.create_view_stats`.
+        databases : Database build parameters.
+        tables : Tables build parameters.
+        views : Views build parameters.
+        views_stats : Views stats build parameters.
+        update_time_triggers : Update time trigger build parameters.
         ask : Whether ask confirm execute.
         skip : Whether skip existing table.
         """
@@ -1229,6 +1379,7 @@ class DatabaseBuildAsync(DatabaseBuildSuper['rengine.DatabaseEngineAsync']):
         tables_orm = tables_orm or []
         views = views or []
         views_stats = views_stats or []
+        update_time_triggers = update_time_triggers or []
         refresh_schema = False
 
         # Database.
@@ -1350,6 +1501,17 @@ class DatabaseBuildAsync(DatabaseBuildSuper['rengine.DatabaseEngineAsync']):
             text = f"View '{params['table']}' of database '{self.engine.database}' build completed."
             print(text)
             refresh_schema = True
+
+        # Update time trigger.
+        for params in update_time_triggers:
+
+            ## Execute.
+            result = await self.add_update_time_trigger(*params)
+
+            ## Report.
+            if result:
+                text = f"Update time trigger '{f'{params[0]}_{params[1]}_update_time'}' of database '{self.engine.database}' add completed."
+                print(text)
 
         # Refresh schema.
         if refresh_schema:
