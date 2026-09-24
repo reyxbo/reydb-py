@@ -137,14 +137,26 @@ class DatabaseORMModelMeta(DatabaseORMBase, SQLModelMetaclass):
                     field = attrs[attr_name] = DatabaseORMModelField(field)
             else:
                 field = attrs[attr_name] = DatabaseORMModelField()
+            annotation = annotations[attr_name]
 
             ### Datetime.
-            annotation = annotations[attr_name]
             if (
                 annotation is Datetime
                 or Datetime in get_type_args(annotation)
             ):
                 field.sa_type = types.DateTime(timezone=False)
+
+            ### JSON.
+            if (
+                (
+                    field.sa_type is JSONB
+                    or isinstance(field.sa_type, JSONB)
+                ) and (
+                    annotation is None
+                    or type(None) in get_type_args(annotation)
+                )
+            ):
+                field.sa_type.none_as_null = True
 
             sa_column_kwargs: dict = field.sa_column_kwargs
             sa_column_kwargs.setdefault('name', attr_name)
